@@ -4,11 +4,39 @@ package celestialsons;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
 
 import orbitalbodies.*;
 
 public class FileHandling {
+
+    public static void convertToCSV(String[] data, String filename) throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(filename);
+        for(String dataEntry : data){
+            byte[] entryBytes = dataEntry.getBytes();
+            outputStream.write(entryBytes);
+            outputStream.write(",".getBytes());
+        }
+    }
+
+    public static void convertFromCSV(String filename) throws IOException {
+        FileInputStream inputStream = new FileInputStream(filename);
+        int streamChar;
+        String[] data = null;
+        StringBuilder tempString = new StringBuilder();
+        while((streamChar = inputStream.read()) != -1){
+            if(streamChar != ','){
+                tempString.append((char)streamChar);
+            } else {
+                System.out.println(tempString);
+                tempString = new StringBuilder();
+            }
+        }
+
+    }
     
     public static Star[] loadStarList(FileReader reader, Scanner scanner, File file) throws IOException{
         int universeSize = 250;

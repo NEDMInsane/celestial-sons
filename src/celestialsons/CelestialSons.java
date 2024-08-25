@@ -2,17 +2,24 @@
 package celestialsons;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class CelestialSons {
     
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException, InterruptedException {
         //GraphicalInterface mainMenu = new GraphicalInterface();
-        System.out.println("Welcome to Celestial Sons");
+        //System.out.println("Welcome to Celestial Sons");
         //Universe newUniverse = FileHandling.loadAlmanacData();
-        gameLoop();
+        //gameLoop();
         //mainMenu.mainMenu();
         //CommandLineUtils.utilityCommandLineMenu();
+        String[] outputStr = {"\"Bob", "Joe\\", "Jim", "1/", "2", "3"};
+        FileHandling.convertToCSV(outputStr, "TEST.csv");
+
+        FileHandling.convertFromCSV("TEST.csv");
     }
+
     
     public static void gameLoop(){
         GraphicalInterface mainMenu = new GraphicalInterface();
