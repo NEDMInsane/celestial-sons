@@ -1,7 +1,5 @@
 package market;
 
-import celestialsons.Contract;
-
 import java.util.HashMap;
 
 public class Market {
