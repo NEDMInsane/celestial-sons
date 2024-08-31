@@ -1,5 +1,8 @@
 package market;
 
+import celestialsons.*;
+
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Market {
@@ -23,5 +26,10 @@ public class Market {
         this.marketData = new HashMap<>();
 
         System.out.println("Market Created: " + marketStationName + " " + marketLocation);
+    }
+
+    public void marketFromCSV(String filename) throws IOException {
+        String[] marketData = FileHandling.convertFromCSV(filename);
+
     }
 }

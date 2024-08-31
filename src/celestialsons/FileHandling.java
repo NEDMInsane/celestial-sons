@@ -22,7 +22,7 @@ public class FileHandling {
         }
     }
 
-    public static void convertFromCSV(String filename) throws IOException {
+    public static String[] convertFromCSV(String filename) throws IOException {
         FileInputStream inputStream = new FileInputStream(filename);
         int streamChar;
         String[] data = null;
@@ -31,11 +31,11 @@ public class FileHandling {
             if(streamChar != ','){
                 tempString.append((char)streamChar);
             } else {
-                System.out.println(tempString);
+                data = new String[]{Arrays.toString(data) + tempString.toString()};
                 tempString = new StringBuilder();
             }
         }
-
+        return data;
     }
     
     public static Star[] loadStarList(FileReader reader, Scanner scanner, File file) throws IOException{
