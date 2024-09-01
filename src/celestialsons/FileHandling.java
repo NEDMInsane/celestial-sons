@@ -1,40 +1,56 @@
 
 package celestialsons;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
 
 import orbitalbodies.*;
 
 public class FileHandling {
 
     public static void convertToCSV(String[] data, String filename) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream(filename);
-        for(String dataEntry : data){
-            byte[] entryBytes = dataEntry.getBytes();
-            outputStream.write(entryBytes);
-            outputStream.write(",".getBytes());
+        try {
+            FileOutputStream outputStream = new FileOutputStream(filename);
+            for (String dataEntry : data) {
+                byte[] entryBytes = dataEntry.getBytes();
+                outputStream.write(entryBytes);
+                outputStream.write(",".getBytes());
+            }
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: ERR:" + e.getMessage());
         }
+    }
+
+    public static int getCSVFields(String filename) throws IOException {
+        FileInputStream inputStream = new FileInputStream(filename);
+        int streamChar;
+        int fields = 0;
+        while ((streamChar = inputStream.read()) != -1) {
+            if (streamChar == ',') {
+                fields++;
+            }
+        }
+        inputStream.close();
+        return fields;
     }
 
     public static String[] convertFromCSV(String filename) throws IOException {
         FileInputStream inputStream = new FileInputStream(filename);
-        int streamChar;
-        String[] data = null;
+        String[] data = new String[getCSVFields(filename)];
         StringBuilder tempString = new StringBuilder();
+        int i = 0, streamChar;
         while((streamChar = inputStream.read()) != -1){
             if(streamChar != ','){
                 tempString.append((char)streamChar);
             } else {
-                data = new String[]{Arrays.toString(data) + tempString.toString()};
+                data[i] = tempString.toString();
                 tempString = new StringBuilder();
+                i++;
             }
         }
+        inputStream.close();
         return data;
     }
     
@@ -57,6 +73,7 @@ public class FileHandling {
             i++;            
             //System.out.printf("Star Name: %s, Star Size: %d, Planets: %s, Star Type: %s\n", starName, starSize, planets, starType);
         }
+        reader.close();
         System.out.println("Starlist created.");
         return starList;
     }
@@ -80,6 +97,7 @@ public class FileHandling {
             //System.out.printf("Star: %s, Planet: %s, Size: %d, Moons: %d, Belts: %s\n", starName, planetName, planetSize, moons, asteroidBelts);
             i++;
         }
+        reader.close();
         System.out.println("Planetlist created.");
         return planetList;
     }
@@ -103,6 +121,7 @@ public class FileHandling {
            moonList[i] = new Moon(moonName, moonSize, resources);
            i++;
         }
+        reader.close();
         System.out.println("Moonlist created.");
         return moonList;
     }

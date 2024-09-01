@@ -17,7 +17,9 @@ public class CelestialSons {
         String[] outputStr = {"\"Bob", "Joe\\", "Jim", "1/", "2", "3"};
         FileHandling.convertToCSV(outputStr, "TEST.csv");
 
-        FileHandling.convertFromCSV("TEST.csv");
+        for(String items : FileHandling.convertFromCSV("star_file.csv")){
+            System.out.println(items);
+        }
     }
 
     

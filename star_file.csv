@@ -1,61 +1,61 @@
 Star Name,Star Size,Planets,Color,
-183,3,4,Red
-984,4,3,Blue-white
-184,1,4,Methane-brown Dwarf
-912,4,2,Blue-white
-203,2,5,Yellow-white
-620,4,2,Yellow-white
-622,1,5,Methane-brown Dwarf
-301,5,3,Yellow-white
-662,4,6,Yellow
-176,3,7,Blue-white
-247,5,6,Yellow-white
-479,5,4,White
-230,2,7,Blue
-472,3,2,Blue
-855,2,1,Yellow
-627,1,7,Methane-brown Dwarf
-382,1,1,Cool-brown Dwarf
-421,5,6,White
-639,3,4,White
-818,1,7,Cool-brown Dwarf
-968,3,3,Yellow
-661,3,8,Red
-819,4,8,Yellow-white
-730,4,5,Blue
-868,1,1,Cool-brown Dwarf
-277,4,3,White
-120,1,7,Cool-brown Dwarf
-480,5,7,White
-329,3,6,White
-180,4,1,Yellow
-890,1,4,Cool-brown Dwarf
-805,1,5,Methane-brown Dwarf
-253,2,6,Yellow
-944,5,2,White
-300,1,5,Cool-brown Dwarf
-902,3,6,Blue-white
-505,3,1,White
-388,3,2,Orange
-233,3,1,Orange
-218,2,4,Orange
-141,2,6,Blue-white
-589,5,5,Orange
-353,5,3,Yellow-white
-235,1,3,Methane-brown Dwarf
-395,4,4,Yellow-white
-822,4,6,White
-159,4,2,Yellow-white
-103,4,6,Blue
-582,1,7,Cool-brown Dwarf
-762,3,1,White
-446,4,3,White
-556,5,2,Blue-white
-204,3,6,Blue
-152,4,8,Yellow-white
-322,2,1,Yellow
-460,5,5,Blue
-911,4,3,Orange
+183,3,4,Red,
+984,4,3,Blue-white,
+184,1,4,Methane-brown Dwarf,
+912,4,2,Blue-white,
+203,2,5,Yellow-white,
+620,4,2,Yellow-white,
+622,1,5,Methane-brown Dwarf,
+301,5,3,Yellow-white,
+662,4,6,Yellow,
+176,3,7,Blue-white,
+247,5,6,Yellow-white,
+479,5,4,White,
+230,2,7,Blue,
+472,3,2,Blue,
+855,2,1,Yellow,
+627,1,7,Methane-brown Dwarf,
+382,1,1,Cool-brown Dwarf,
+421,5,6,White,
+639,3,4,White,
+818,1,7,Cool-brown Dwarf,
+968,3,3,Yellow,
+661,3,8,Red,
+819,4,8,Yellow-white,
+730,4,5,Blue,
+868,1,1,Cool-brown Dwarf,
+277,4,3,White,
+120,1,7,Cool-brown Dwarf,
+480,5,7,White,
+329,3,6,White,
+180,4,1,Yellow,
+890,1,4,Cool-brown Dwarf,
+805,1,5,Methane-brown Dwarf,
+253,2,6,Yellow,
+944,5,2,White,
+300,1,5,Cool-brown Dwarf,
+902,3,6,Blue-white,
+505,3,1,White,
+388,3,2,Orange,
+233,3,1,Orange,
+218,2,4,Orange,
+141,2,6,Blue-white,
+589,5,5,Orange,
+353,5,3,Yellow-white,
+235,1,3,Methane-brown Dwarf,
+395,4,4,Yellow-white,
+822,4,6,White,
+159,4,2,Yellow-white,
+103,4,6,Blue,
+582,1,7,Cool-brown Dwarf,
+762,3,1,White,
+446,4,3,White,
+556,5,2,Blue-white,
+204,3,6,Blue,
+152,4,8,Yellow-white,
+322,2,1,Yellow,
+460,5,5,Blue,
+911,4,3,Orange,
 153,4,5,Orange
 597,3,6,White
 695,3,8,Orange
@@ -226,26 +226,26 @@ Star Name,Star Size,Planets,Color,
 656,3,3,Red
 374,5,2,Orange
 824,3,5,Blue-white
-167,2,7,White
-910,3,2,Yellow-white
-650,3,8,Yellow-white
-615,3,4,Yellow-white
-100,2,7,Blue-white
-727,5,4,Blue-white
-242,3,4,Orange
-788,1,8,Red-brown Dwarf
-610,5,1,Yellow
-857,4,6,Blue-white
-504,3,1,Yellow
-239,3,1,Yellow-white
-431,2,5,Blue
-249,1,2,Red-brown Dwarf
-994,2,1,Red
-222,4,8,Blue
-709,3,7,Yellow-white
-464,1,2,Cool-brown Dwarf
-541,5,2,Red
-281,3,5,Blue
-832,5,8,Orange
-519,1,7,Methane-brown Dwarf
-273,4,7,Blue-white
+167,2,7,White,
+910,3,2,Yellow-white,
+650,3,8,Yellow-white,
+615,3,4,Yellow-white,
+100,2,7,Blue-white,
+727,5,4,Blue-white,
+242,3,4,Orange,
+788,1,8,Red-brown Dwarf,
+610,5,1,Yellow,
+857,4,6,Blue-white,
+504,3,1,Yellow,
+239,3,1,Yellow-white,
+431,2,5,Blue,
+249,1,2,Red-brown Dwarf,
+994,2,1,Red,
+222,4,8,Blue,
+709,3,7,Yellow-white,
+464,1,2,Cool-brown Dwarf,
+541,5,2,Red,
+281,3,5,Blue,
+832,5,8,Orange,
+519,1,7,Methane-brown Dwarf,
+273,4,7,Blue-white,
