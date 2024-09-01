@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CelestialSons {
     
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         //GraphicalInterface mainMenu = new GraphicalInterface();
         //System.out.println("Welcome to Celestial Sons");
         //Universe newUniverse = FileHandling.loadAlmanacData();

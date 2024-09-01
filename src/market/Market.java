@@ -30,6 +30,7 @@ public class Market {
 
     public void marketFromCSV(String filename) throws IOException {
         String[] marketData = FileHandling.convertFromCSV(filename);
+        // Fields for the CSV: Product, Quantity, Price Each, Comp/Person selling
 
     }
 }
