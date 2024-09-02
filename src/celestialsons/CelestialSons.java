@@ -1,6 +1,8 @@
 
 package celestialsons;
 
+import market.Market;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -8,18 +10,22 @@ import java.util.concurrent.TimeUnit;
 public class CelestialSons {
     
     public static void main(String[] args) throws IOException {
-        //GraphicalInterface mainMenu = new GraphicalInterface();
-        //System.out.println("Welcome to Celestial Sons");
-        //Universe newUniverse = FileHandling.loadAlmanacData();
-        //gameLoop();
-        //mainMenu.mainMenu();
-        //CommandLineUtils.utilityCommandLineMenu();
+        /*
+        GraphicalInterface mainMenu = new GraphicalInterface();
+        System.out.println("Welcome to Celestial Sons");
+        Universe newUniverse = FileHandling.loadAlmanacData();
+        gameLoop();
+        mainMenu.mainMenu();
+        CommandLineUtils.utilityCommandLineMenu();
         String[] outputStr = {"\"Bob", "Joe\\", "Jim", "1/", "2", "3"};
         FileHandling.convertToCSV(outputStr, "TEST.csv");
 
         for(String items : FileHandling.convertFromCSV("star_file.csv")){
             System.out.println(items);
-        }
+        }*/
+        Market market = new Market();
+        market.fromCSV("testing/market.csv");
+        market.printMarketData();
     }
 
     

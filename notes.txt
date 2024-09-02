@@ -7,6 +7,15 @@ Space is "fully" simulated. Stars, Planets, Moons, Asteroid Belts, Space Station
 	Game Grid:
 		
 		Each area is typically in a star system. Star systems are quite large, but for full simulation we
-		need to actally define areas of the system. 
+		need to actually define areas of the system.
 			- 0,0,0 aka the center of the system in the Stars location
 			outside of that are the different orbital bodies.
+
+Market CSV
+    Each Station (if market module is installed) will have their own market.
+    In the CSV the first 2 fields will be the Location, and the Station name. But the character only cares
+    about the following:
+    Product, Quantity, Price per Unit, Corp/Person selling
+
+    but the actual CSV will be:
+    Location, Station Name, Product, Quantity, Price per Unit, Corp/Person Selling
