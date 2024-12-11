@@ -37,6 +37,7 @@ public class Market {
 
     public void fromCSV(String filename) throws IOException {
         String[] rawMarketData = FileHandling.convertFromCSV(filename);
+        // rawMarketData is providing erroneous data. "\n" and adding spaces and commas. needs fixed.
         String[] marketDataList = new String[(rawMarketData.length / 6)];
         for(int i = 0; i < marketDataList.length; i++){
             int start = i * 6;
@@ -46,6 +47,7 @@ public class Market {
         Contract[] marketData = new Contract[marketDataList.length];
         for(int i = 0; i < marketDataList.length; i++){
             String[] temp = marketDataList[i].split(",");
+            System.out.println(Arrays.toString(temp));
             marketData[i] = new Contract(temp[2], temp[5], Integer.parseInt(temp[3]), Double.parseDouble(temp[4]));
         }
         // Fields for the CSV: Location, Station Name, Product, Quantity, Price Each, Comp/Person selling

@@ -24,9 +24,11 @@ public class FileHandling {
     }
 
     public static int getCSVFields(String filename) throws IOException {
+        // Returns how many fields there are.
         FileInputStream inputStream = new FileInputStream(filename);
         int streamChar;
         int fields = 0;
+        // While the character is not the EOF character, continue.
         while ((streamChar = inputStream.read()) != -1) {
             if (streamChar == ',') {
                 fields++;
@@ -38,9 +40,11 @@ public class FileHandling {
 
     public static String[] convertFromCSV(String filename) throws IOException {
         FileInputStream inputStream = new FileInputStream(filename);
+        // Using getCSVFields tog et the side of the array needed.
         String[] data = new String[getCSVFields(filename)];
         StringBuilder tempString = new StringBuilder();
         int i = 0, streamChar;
+        // Need to purge special Characters.
         while((streamChar = inputStream.read()) != -1){
             if(streamChar != ','){
                 tempString.append((char)streamChar);
