@@ -7,7 +7,8 @@ public class Universe {
     private Star[] starList;
     private Planet[] planetList;
     private Moon[] moonList;
-    
+
+    // Why load all these when the stars each contain their own planet list, which contain the moons...?
     public Universe(Star[] starList, Planet[] planetList, Moon[] moonList){
         this.starList = starList;
         this.planetList = planetList;

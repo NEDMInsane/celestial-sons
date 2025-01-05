@@ -29,17 +29,20 @@ public class Star extends OrbitalBodies {
         this.starSize = starSize;
         this.planets = planetList;
     }
-    
-    public void generateGravityWell(){
+
+    // TODO: Self generation needs reworked.
+/*    public void generateGravityWell(){
         this.planets = new Planet[3];
         
         for(int i = 0; i < this.planets.length; i++){
             Planet newPlanet = new Planet(this.name + i, "Water", 2);
             this.planets[i] = newPlanet;
         }
+    }*/
+    
+    public void setPlanets(Planet[] planetList){
+        this.planets = planetList;
     }
-    
-    
     
     public String getName(){
         return this.name;

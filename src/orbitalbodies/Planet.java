@@ -9,7 +9,10 @@ public class Planet extends OrbitalBodies {
      * 
      * The size of a planet will determine the amount of things in the gravity well
      */
-    
+
+    final Star star; // Need to know what gravity well this planet belongs to.
+
+
     final String name;
     final String planetType;
     final int planetSize;
@@ -18,7 +21,8 @@ public class Planet extends OrbitalBodies {
     private Moon[] moons;
     private SpaceStation[] spaceStations;
     
-    public Planet(String name, String planetType, int planetSize, Moon[] moonList, AsteroidBelt[] beltList){
+    public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList, AsteroidBelt[] beltList){
+        this.star = star;
         this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
@@ -26,29 +30,33 @@ public class Planet extends OrbitalBodies {
         this.asteroidBelts = beltList;
     }
     
-    public Planet(String name, String planetType, int planetSize, Moon[] moonList, int asteroidBelts){
+    public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList, int asteroidBelts){
         this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.moons = moonList;
+        this.star = star;
         System.out.printf("Generate %d belts for %s.\n", asteroidBelts, name);
     }
     
-    public Planet(String name, String planetType, int planetSize, int asteroidBelts){
+    public Planet(Star star, String name, String planetType, int planetSize, int asteroidBelts){
         this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
+        this.star = star;
         System.out.printf("Generate %d belts for %s.\n", asteroidBelts, name);
     }
     
-    public Planet(String name, String planetType, int planetSize, Moon[] moonList){
+    public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList){
+        this.star = star;
         this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.moons = moonList;
     }
     
-    public Planet(String name, String planetType, int planetSize){
+    public Planet(Star star, String name, String planetType, int planetSize){
+        this.star = star;
         this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
