@@ -8,7 +8,9 @@ public class OrbitalBodies {
     //private Vector3d velocity = new Vector3d(0.0, 0.0, 0.0);
     private Vector3d startingPosition = new Vector3d(0.0, 0.0, 0.0);
     private Vector3d position = new Vector3d(0.0, 0.0, 0.0);
-    
+
+
+
     public Vector3d getStartingPosition(){
         return this.startingPosition;
     }
@@ -24,5 +26,13 @@ public class OrbitalBodies {
     public void setPosition(Vector3d position){
         this.position = position;
     }
-    
+
+    final String name;
+
+    public OrbitalBodies(String name) {
+        this.name = name;
+    }
+
+    public String getName() { return this.name; }
+    public String toString(){ return this.name; }
 }

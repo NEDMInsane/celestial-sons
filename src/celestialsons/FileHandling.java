@@ -99,7 +99,7 @@ public class FileHandling {
             int moons = scanner.nextInt(); //Throw away value.
             int asteroidBelts = scanner.nextInt();
             scanner.nextLine();
-            planetList[i] = new Planet(planetName, null, planetSize, asteroidBelts);
+            planetList[i] = new Planet(null, planetName, null, planetSize, asteroidBelts);
             //System.out.printf("Star: %s, Planet: %s, Size: %d, Moons: %d, Belts: %s\n", starName, planetName, planetSize, moons, asteroidBelts);
             i++;
         }
@@ -113,7 +113,7 @@ public class FileHandling {
         scanner = new Scanner(reader);
         
         scanner.useDelimiter(",");
-        scanner.nextLine(); // Get ride of the header data.
+        scanner.nextLine(); // Get rid of the header data.
         Moon[] moonList = new Moon[fileLength(file) - 1];
         int i = 0;
         System.out.println(i);

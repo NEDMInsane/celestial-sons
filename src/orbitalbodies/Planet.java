@@ -12,8 +12,6 @@ public class Planet extends OrbitalBodies {
 
     final Star star; // Need to know what gravity well this planet belongs to.
 
-
-    final String name;
     final String planetType;
     final int planetSize;
     
@@ -22,8 +20,8 @@ public class Planet extends OrbitalBodies {
     private SpaceStation[] spaceStations;
     
     public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList, AsteroidBelt[] beltList){
+        super(name);
         this.star = star;
-        this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.moons = moonList;
@@ -31,7 +29,7 @@ public class Planet extends OrbitalBodies {
     }
     
     public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList, int asteroidBelts){
-        this.name = name;
+        super(name);
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.moons = moonList;
@@ -40,7 +38,7 @@ public class Planet extends OrbitalBodies {
     }
     
     public Planet(Star star, String name, String planetType, int planetSize, int asteroidBelts){
-        this.name = name;
+        super(name);
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.star = star;
@@ -48,16 +46,16 @@ public class Planet extends OrbitalBodies {
     }
     
     public Planet(Star star, String name, String planetType, int planetSize, Moon[] moonList){
+        super(name);
         this.star = star;
-        this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
         this.moons = moonList;
     }
     
     public Planet(Star star, String name, String planetType, int planetSize){
+        super(name);
         this.star = star;
-        this.name = name;
         this.planetType = planetType;
         this.planetSize = planetSize;
         //If no other arguments are passed we will generate the belts, moon, stations.
@@ -85,7 +83,6 @@ public class Planet extends OrbitalBodies {
         }
     }
     
-    public String getName(){return this.name;}
     public String getPlanetType(){return this.planetType;}
     public int getPlanetSize(){return this.planetSize;}
     public AsteroidBelt[] getAsteroidBelts(){return this.asteroidBelts;}

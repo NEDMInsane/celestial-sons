@@ -3,28 +3,27 @@ package orbitalbodies;
 
 
 public class Star extends OrbitalBodies {
-    final String name;
     final String starType;
     final int starSize;
     
     private Planet[] planets;
     
     public Star(String name){
-        this.name = name;
+        super(name);
         this.starType = null;
         this.starSize = 0;
         //Basiclly a blackhole lol
     }
     
     public Star(String name, String starType, int starSize){
-        this.name = name;
+        super(name);
         this.starType = starType;
         this.starSize = starSize;
         //if no planets are passed, we will generate them.
     }
     
     public Star(String name, String starType, int starSize, Planet[] planetList){
-        this.name = name;
+        super(name);
         this.starType = starType;
         this.starSize = starSize;
         this.planets = planetList;
@@ -43,10 +42,7 @@ public class Star extends OrbitalBodies {
     public void setPlanets(Planet[] planetList){
         this.planets = planetList;
     }
-    
-    public String getName(){
-        return this.name;
-    }
+
     public String getStarType(){
         return this.starType;
     }

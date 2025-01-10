@@ -31,5 +31,14 @@ public class GenerateUniverse {
         starList[0] = jita;
         starList[1] = newCaldari;
         starList[2] = sobasekai;
+
+        PlayerCharacter[] playerCharacterList = new PlayerCharacter[1];
+        playerCharacterList[0] = new PlayerCharacter("NEDMInsane", 100);
+        playerCharacterList[0].setSystem(starList[0]);
+
+        Universe universe = new Universe(starList);
+
+        GraphicalInterface graphicalInterface = new GraphicalInterface();
+        graphicalInterface.mainMenu(universe, null, playerCharacterList);
     }
 }

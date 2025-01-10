@@ -12,16 +12,17 @@ public class AsteroidBelt extends OrbitalBodies {
     private String name;
     
     public AsteroidBelt(){
+        super(null);
         this.asteroidType = "";
     }
     
     public AsteroidBelt(String name){
-        this.name = name;
+        super(name);
         this.asteroidType = "Titanium";
     }
     
     public AsteroidBelt(String name, String asteroidType){
-        this.name = name;
+        super(name);
         this.asteroidType = asteroidType;
     }
     
