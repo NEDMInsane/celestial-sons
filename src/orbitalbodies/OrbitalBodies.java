@@ -1,32 +1,27 @@
-
 package orbitalbodies;
 
-import celestialsons.Vector3d;
+import celestialsons.DimensionalPosition;
 
 public class OrbitalBodies {
     // PLANETS MOVE(maybe)!?
-    //private Vector3d velocity = new Vector3d(0.0, 0.0, 0.0);
-    private Vector3d startingPosition = new Vector3d(0.0, 0.0, 0.0);
-    private Vector3d position = new Vector3d(0.0, 0.0, 0.0);
+    //private DimensionalPosition velocity = new DimensionalPosition(0.0, 0.0, 0.0);
+    private DimensionalPosition startingPosition = new DimensionalPosition(0.0, 0.0, 0.0);
+    private DimensionalPosition position = new DimensionalPosition(0.0, 0.0, 0.0);
 
 
 
-    public Vector3d getStartingPosition(){
+    public DimensionalPosition getStartingPosition(){
         return this.startingPosition;
     }
-    
-    public void setStartingPosition(Vector3d position){
+    public void setStartingPosition(DimensionalPosition position){
         this.startingPosition = position;
     }
-    
-    public Vector3d getPosition(){
+    public DimensionalPosition getPosition(){
         return this.position;
     }
-    
-    public void setPosition(Vector3d position){
+    public void setPosition(DimensionalPosition position){
         this.position = position;
     }
-
     final String name;
 
     public OrbitalBodies(String name) {

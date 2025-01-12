@@ -98,7 +98,7 @@ public class CommandLineUtils {
                     }
                     break;
                 case 6:
-                    player.setLocation(new Vector3d(3.0, 3.0, 3.0));
+                    player.setLocation(new DimensionalPosition(3.0, 3.0, 3.0));
                     break;
                 default:
                     selection = 9;

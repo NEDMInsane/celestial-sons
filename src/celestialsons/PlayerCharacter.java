@@ -1,4 +1,3 @@
-
 package celestialsons;
 
 import java.util.HashMap;
@@ -12,7 +11,7 @@ public class PlayerCharacter {
     private double exp;
     private int health;
     
-    private Vector3d currentLocation = new Vector3d(0, 0, 0);
+    private DimensionalPosition currentLocation = new DimensionalPosition(0, 0, 0);
     private Star currentSystem;
     
     private Ship currentHull = new Ship();
@@ -121,8 +120,8 @@ public class PlayerCharacter {
 
     public void setSystem(Star star){this.currentSystem = star;}
     public Star getCurrentSystem(){return this.currentSystem;}
-    public void setLocation(Vector3d location){this.currentLocation = location;}
-    public Vector3d getCurrentLocation(){return this.currentLocation;}
+    public void setLocation(DimensionalPosition location){this.currentLocation = location;}
+    public DimensionalPosition getCurrentLocation(){return this.currentLocation;}
     public void increaseLevel(){this.level++;}
     public void increaseLevel(int levels){this.level += levels;}
     public void decreaseLevel(){this.level--;}

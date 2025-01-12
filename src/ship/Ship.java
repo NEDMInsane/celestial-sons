@@ -2,7 +2,7 @@
 package ship;
 
 import java.util.HashMap;
-import celestialsons.Vector3d;
+import celestialsons.DimensionalPosition;
 
 /*
 Ships operate in 3 different ways
@@ -26,9 +26,9 @@ public class Ship {
     private int harmonicMaxSpeed = 0;
     private int jumpDriveDist = 0; //Lightyears
     
-    private Vector3d velocity = new Vector3d(0.0, 0.0, 0.0);
-    private Vector3d currentPosition = new Vector3d(0.0, 0.0, 0.0);
-    private Vector3d radarCrossSection = new Vector3d(10.0, 10.0, 10.0);
+    private DimensionalPosition velocity = new DimensionalPosition(0.0, 0.0, 0.0);
+    private DimensionalPosition currentPosition = new DimensionalPosition(0.0, 0.0, 0.0);
+    private DimensionalPosition radarCrossSection = new DimensionalPosition(10.0, 10.0, 10.0);
     
     public void update(){
         currentPosition.add(velocity);

@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import javax.swing.JOptionPane;
+import javax.swing.border.BevelBorder;
 
 
 public class GraphicalInterface {
@@ -73,6 +74,10 @@ public class GraphicalInterface {
         this.universe = universe;
         this.nonPlayerCharacters = nonPlayerCharacters;
         this.playerCharacters = playerCharacters;
+
+        System.out.println("Creating Debug Menu");
+        System.out.println(this.universe);
+
         JFrame menu = new JFrame("Debug Menu");
         menu.setSize(this.width, this.height);
         menu.setLayout(new FlowLayout());
@@ -94,8 +99,12 @@ public class GraphicalInterface {
         JButton universeMenu = new JButton("Universe Menu");
         universeMenu.addActionListener(event -> universeMenu());
 
+        JButton startCurGame = new JButton("Start Current Game");
+        startCurGame.addActionListener( event -> gameMenu(menu));
+
         menu.add(characterMenu);
         menu.add(universeMenu);
+        menu.add(startCurGame);
         menu.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
@@ -263,7 +272,71 @@ public class GraphicalInterface {
     public void loadGameFile(String fileName){
         JOptionPane.showConfirmDialog(this.frame, "Loading game");
     }
-    
+
+    public void gameMenu(JFrame parentFrame){
+        // Need to add something to make all this stuff update when things change.
+        parentFrame.setVisible(false);
+        JFrame game = new JFrame("Celestial Sons");
+        game.setSize(1200, 900);
+        game.setLayout(new BorderLayout(2, 10));
+        game.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                parentFrame.setVisible(true);
+            }
+        });
+
+        // Menu Bar Stuff (Hopefully Above Main Panel//
+        JMenuBar menuBar = new JMenuBar(); // need to add menu bar functions
+        game.add(menuBar, BorderLayout.PAGE_START);
+        JMenu fileMenu = new JMenu("File");
+        menuBar.add(fileMenu);
+
+        // Setup the main panel where everything will live //
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createTitledBorder(String.format("%s", this.playerCharacters[0].getName())));
+        game.add(mainPanel, BorderLayout.CENTER);
+
+        // Navigation Pane (Left Side) Stuff //
+        JPanel navigationPanel = new JPanel();
+        navigationPanel.setBorder(BorderFactory.createTitledBorder("Navigation"));
+        navigationPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        JLabel currSystemLbl = new JLabel(String.format("Current System: %s", this.playerCharacters[0].getCurrentSystem()));
+        
+        c.gridx = 0;
+        c.gridy = 0;
+        navigationPanel.add(currSystemLbl, c);
+        JLabel currLocationLbl = new JLabel(String.format("Current Location: %s", this.playerCharacters[0].getCurrentLocation().toLabel()));
+        c.gridx = 0;
+        c.gridy = 1;
+        navigationPanel.add(currLocationLbl, c);
+
+
+        // RADAR Panel (Center) Stuff //
+        JPanel radarPanel = new JPanel();
+        radarPanel.setName("Radar");
+        JLabel radarLbl = new JLabel("Radar PANEL!");
+        radarPanel.add(radarLbl);
+        radarPanel.setBorder(BorderFactory.createTitledBorder("Radar-LongRange"));
+
+        mainPanel.add(navigationPanel, BorderLayout.LINE_START);
+        mainPanel.add(radarPanel, BorderLayout.CENTER);
+
+        // Status Bar Stuff //
+        JPanel statusPanel = new JPanel();
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        statusPanel.setSize(game.getWidth(), 25);
+        JLabel currentTime = new JLabel(String.format("Current Time: %s", System.currentTimeMillis()));
+        statusPanel.add(currentTime);
+
+        game.add(statusPanel, BorderLayout.PAGE_END);
+        game.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        game.setVisible(true);
+
+    }
+
     public void closeWindow(){
         this.frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.frame.dispose();

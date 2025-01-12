@@ -1,13 +1,11 @@
-
 package celestialsons;
 
-
-public class Vector3d {
+public class DimensionalPosition {
     private double x;
     private double y;
     private double z;
     
-    public Vector3d(double x, double y, double z){
+    public DimensionalPosition(double x, double y, double z){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -61,10 +59,14 @@ public class Vector3d {
     
     @Override
     public String toString(){
-        return String.format("Vector3D{ x = %.2f, y = %.2f, z = %.2f}", this.x, this.y, this.z);
+        return String.format("DimensionalPosition{ x = %.2f, y = %.2f, z = %.2f}", this.x, this.y, this.z);
+    }
+
+    public String toLabel(){
+        return String.format("%.2f, %.2f, %.2f", this.x, this.y, this.z);
     }
     
-    public void add(Vector3d value){
+    public void add(DimensionalPosition value){
         this.x = this.x + value.getX();
         this.y = this.y + value.getY();
         this.z = this.z + value.getZ();
