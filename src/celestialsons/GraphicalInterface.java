@@ -273,6 +273,12 @@ public class GraphicalInterface {
         JOptionPane.showConfirmDialog(this.frame, "Loading game");
     }
 
+    public void launchLoginAndGame(Universe universe, NonPlayerCharacter[] nonPlayerCharacters, PlayerCharacter[] playerCharacters) {
+        GameServer server = new GameServer(universe, nonPlayerCharacters, playerCharacters);
+        GameClient client = new GameClient(server);
+        client.show();
+    }
+
     public void gameMenu(JFrame parentFrame){
         // Need to add something to make all this stuff update when things change.
         parentFrame.setVisible(false);

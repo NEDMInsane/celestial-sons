@@ -1,4 +1,5 @@
-package celestialsons;
+/*
+package deprecated;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
@@ -40,4 +41,4 @@ public class LanternaTUI {
         gui.addWindowAndWait(window);
 
     }
-}
+}*/
