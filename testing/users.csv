@@ -1,1 +1,2 @@
-username,salt,passwordHash,createdAt
+serverName,username,salt,passwordHash,createdAt,characterName,shipType,systemName,stationName,docked
+Local Game Server,NEDMinsane,ST419fGjAghrfkawLT6nOw==,1hYMT4a/fjC743ILglfOkHyANmF5NmLOAvkzCPSHnN4=,2026-06-28T01:13:01.642007138Z,NEDMInsane,Frigate,Nadir Point,NadirPoint-TradeHub-1,false

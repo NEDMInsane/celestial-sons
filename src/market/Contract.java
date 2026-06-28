@@ -32,4 +32,9 @@ public class Contract {
                 pricePerUnit;
         return builder.split(",");
     }
+
+    public String getItemName() { return this.itemName; }
+    public String getSellingParty() { return this.sellingParty; }
+    public int getQuantity() { return this.quantity; }
+    public double getPricePerUnit() { return this.pricePerUnit; }
 }

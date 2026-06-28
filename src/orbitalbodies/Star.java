@@ -43,6 +43,9 @@ public class Star extends OrbitalBodies {
     public void setPlanets(Planet[] planetList){
         this.planets = planetList;
     }
+    public Planet[] getPlanets(){
+        return this.planets;
+    }
     public String getStarType(){
         return this.starType;
     }

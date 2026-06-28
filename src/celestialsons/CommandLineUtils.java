@@ -5,6 +5,7 @@
 
 package celestialsons;
 
+import java.io.IOException;
 import java.util.Scanner;
 import orbitalbodies.*;
 
@@ -104,6 +105,17 @@ public class CommandLineUtils {
                     selection = 9;
                     break;
             }
+        }
+    }
+
+    public static void regenerateUniverseCsvs() throws IOException {
+        UniverseGenerator.generateSevenSystemUniverse("testing");
+    }
+
+    public static void main(String[] args) throws IOException {
+        if (args != null && args.length > 0 && "generate-universe".equalsIgnoreCase(args[0])) {
+            regenerateUniverseCsvs();
+            System.out.println("Generated testing/ universe CSV files.");
         }
     }
     

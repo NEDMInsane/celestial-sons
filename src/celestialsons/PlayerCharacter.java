@@ -2,6 +2,7 @@ package celestialsons;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 import orbitalbodies.*;
 import ship.*;
 
@@ -12,7 +13,17 @@ public class PlayerCharacter {
     private int health;
     
     private DimensionalPosition currentLocation = new DimensionalPosition(0, 0, 0);
+    private DimensionalPosition currentVelocity = new DimensionalPosition(0, 0, 0);
     private Star currentSystem;
+    private boolean transponderActive = true;
+    private DimensionalPosition[] flightPlan = new DimensionalPosition[0];
+    private String flightPlanLabel = "No filed flight plan";
+    private int flightPlanIndex = 0;
+    private double currentSpeed = 0.0;
+    private long lastMotionUpdateMillis = 0L;
+    private boolean docked = false;
+    private String currentStationName = "";
+    private String shipType = "Unassigned";
     
     private Ship currentHull = new Ship();
     
@@ -122,6 +133,31 @@ public class PlayerCharacter {
     public Star getCurrentSystem(){return this.currentSystem;}
     public void setLocation(DimensionalPosition location){this.currentLocation = location;}
     public DimensionalPosition getCurrentLocation(){return this.currentLocation;}
+    public void setVelocity(DimensionalPosition velocity){this.currentVelocity = velocity;}
+    public DimensionalPosition getVelocity(){return this.currentVelocity;}
+    public void setTransponderActive(boolean active){this.transponderActive = active;}
+    public boolean isTransponderActive(){return this.transponderActive;}
+    public void setFlightPlan(DimensionalPosition[] flightPlan){
+        this.flightPlan = flightPlan == null ? new DimensionalPosition[0] : Arrays.copyOf(flightPlan, flightPlan.length);
+        this.flightPlanIndex = this.flightPlan.length > 1 ? 1 : 0;
+    }
+    public DimensionalPosition[] getFlightPlan(){return Arrays.copyOf(this.flightPlan, this.flightPlan.length);}
+    public void setFlightPlanLabel(String flightPlanLabel){this.flightPlanLabel = flightPlanLabel;}
+    public String getFlightPlanLabel(){return this.flightPlanLabel;}
+    public void setFlightPlanIndex(int flightPlanIndex){this.flightPlanIndex = Math.max(0, flightPlanIndex);}
+    public int getFlightPlanIndex(){return this.flightPlanIndex;}
+    public void setCurrentSpeed(double currentSpeed){this.currentSpeed = Math.max(0.0, currentSpeed);}
+    public double getCurrentSpeed(){return this.currentSpeed;}
+    public void setLastMotionUpdateMillis(long lastMotionUpdateMillis){this.lastMotionUpdateMillis = lastMotionUpdateMillis;}
+    public long getLastMotionUpdateMillis(){return this.lastMotionUpdateMillis;}
+    public void setDocked(boolean docked){this.docked = docked;}
+    public boolean isDocked(){return this.docked;}
+    public void setCurrentStationName(String currentStationName){this.currentStationName = currentStationName;}
+    public String getCurrentStationName(){return this.currentStationName;}
+    public void setShipType(String shipType){this.shipType = shipType;}
+    public String getShipType(){return this.shipType;}
+    public void setCurrentHull(Ship currentHull){this.currentHull = currentHull;}
+    public Ship getCurrentHull(){return this.currentHull;}
     public void increaseLevel(){this.level++;}
     public void increaseLevel(int levels){this.level += levels;}
     public void decreaseLevel(){this.level--;}

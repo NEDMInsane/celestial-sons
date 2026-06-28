@@ -82,11 +82,17 @@ public class Planet extends OrbitalBodies {
             this.spaceStations[i] = newSpaceStation;
         }
     }
+
+    public void setSpaceStations(SpaceStation[] spaceStations) {
+        this.spaceStations = spaceStations;
+    }
     
     public String getPlanetType(){return this.planetType;}
     public int getPlanetSize(){return this.planetSize;}
     public AsteroidBelt[] getAsteroidBelts(){return this.asteroidBelts;}
     public Moon[] getMoons(){return this.moons;}
     public SpaceStation[] getSpaceStation(){return this.spaceStations;}
+    public SpaceStation[] getSpaceStations(){return this.spaceStations;}
+    public Star getStar(){return this.star;}
     
 }

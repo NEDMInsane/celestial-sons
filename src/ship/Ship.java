@@ -56,6 +56,7 @@ public class Ship {
     }
     
     public String getShipType() { return this.shipType; }
+    public void setShipType(String shipType) { this.shipType = shipType; }
     public HashMap<String, Integer> getShipSpecialties() { return this.shipSpecialties; }
     public int getHardpoints() { return this.hardPoints; }
     public int getLauncherSlots() { return this.launcherSlots; }
@@ -67,4 +68,3 @@ public class Ship {
     public int getHarmonicMaxSpeed() { return this.harmonicMaxSpeed; }
     public int getJumpDriveDist() { return this.jumpDriveDist; }
 }
-

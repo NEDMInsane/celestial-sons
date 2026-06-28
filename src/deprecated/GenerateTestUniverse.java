@@ -1,3 +1,4 @@
+/*
 package celestialsons;
 
 
@@ -18,6 +19,7 @@ public class GenerateTestUniverse {
         return star;
     }
     public static void main(String[] args) {
+*/
 /*        Star jita = new Star("Jita");
         Star newCaldari = new Star("New Caldari");
         Star sobasekai = new Star("Sobasekai");
@@ -36,7 +38,8 @@ public class GenerateTestUniverse {
         for (int i = 0; i < sobasekiPlanetList.length ; i++) {
             sobasekiPlanetList[i] = new Planet(sobasekai, "Sobaseki-" + i, "Any", 1, null, null);
         }
-        sobasekai.setPlanets(sobasekiPlanetList);*/
+        sobasekai.setPlanets(sobasekiPlanetList);*//*
+
         System.out.println("Generating Test universe...");
         Star[] starList = new Star[3];
         starList[0] = createSystem("Jita", 5);
@@ -55,3 +58,4 @@ public class GenerateTestUniverse {
         graphicalInterface.mainMenu(universe, null, playerCharacterList);
     }
 }
+*/
