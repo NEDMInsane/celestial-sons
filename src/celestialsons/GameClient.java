@@ -15,6 +15,8 @@ import java.util.List;
 
 import orbitalbodies.Star;
 
+import static java.lang.Math.clamp;
+
 public class GameClient {
     private static final int[] RADAR_RANGES_KM = {1, 10, 50, 100, 200, 1000};
     private static final double SYSTEM_MAP_SCALE = 1.0;

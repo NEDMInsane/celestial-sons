@@ -799,7 +799,7 @@ public class GameServer implements GameServerConnection {
         DimensionalPosition safeTarget = copyPosition(desired);
         List<OrbitalObstacle> obstacles = collectObstacles(system);
         for (OrbitalObstacle obstacle : obstacles) {
-            if (containsPoint(obstacle, safeTarget)) {
+            if (obstacle.containsPoint(safeTarget)) {
                 DimensionalPosition away = vectorFromCenter(obstacle.position, start);
                 if (away == null) {
                     away = new DimensionalPosition(1.0, 0.0, 0.0);
@@ -1104,6 +1104,19 @@ public class GameServer implements GameServerConnection {
         private OrbitalObstacle(DimensionalPosition position, double radius) {
             this.position = position;
             this.radius = radius;
+        }
+
+        private boolean containsPoint(DimensionalPosition point) {
+            if (point == null || this.position == null) {
+                return false;
+            }
+            double dx = point.getX() - this.position.getX();
+            double dy = point.getY() - this.position.getY();
+            double dz = point.getZ() - this.position.getZ();
+
+            double distanceSquared = (dx * dx) + (dy * dy) + (dz * dz);
+
+            return distanceSquared <= (this.radius * this.radius);
         }
     }
 
