@@ -9,11 +9,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import orbitalbodies.Star;
+import celestialsons.orbitalbodies.Star;
 
 import static java.lang.Math.clamp;
 
@@ -665,9 +664,9 @@ public class GameClient {
         dialog.setLocationRelativeTo(this.frame);
         JTextArea marketArea = createReadOnlyArea();
         StringBuilder text = new StringBuilder();
-        market.Contract[] contracts = state.getMarketContracts();
+        celestialsons.market.Contract[] contracts = state.getMarketContracts();
         if (contracts != null) {
-            for (market.Contract contract : contracts) {
+            for (celestialsons.market.Contract contract : contracts) {
                 text.append(contract.getItemName())
                         .append(" x").append(contract.getQuantity())
                         .append(" @ ").append(contract.getPricePerUnit())

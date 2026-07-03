@@ -1,6 +1,4 @@
-package market;
-
-import celestialsons.*;
+package celestialsons.market;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Market {
-    //Not all stations will have a traditional market.
+    //Not all stations will have a traditional celestialsons.market.
     private String marketStationName;
     private String marketLocation;
 

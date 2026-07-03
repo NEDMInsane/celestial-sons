@@ -1,4 +1,4 @@
-package market;
+package celestialsons.market;
 
 import java.util.Scanner;
 

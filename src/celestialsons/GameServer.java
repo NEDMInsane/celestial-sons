@@ -1,12 +1,12 @@
 package celestialsons;
 
-import market.Contract;
-import market.Market;
-import orbitalbodies.Moon;
-import orbitalbodies.Planet;
-import orbitalbodies.SpaceStation;
-import orbitalbodies.Star;
-import ship.Ship;
+import celestialsons.market.Contract;
+import celestialsons.market.Market;
+import celestialsons.orbitalbodies.Moon;
+import celestialsons.orbitalbodies.Planet;
+import celestialsons.orbitalbodies.SpaceStation;
+import celestialsons.orbitalbodies.Star;
+import celestialsons.ship.Ship;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -594,7 +594,7 @@ public class GameServer implements GameServerConnection {
     private Market loadStationMarket() {
         Market market = new Market();
         try {
-            market.fromCSV("testing/market.csv");
+            market.fromCSV("testing/celestialsons.market.csv");
         } catch (IOException e) {
             return null;
         }

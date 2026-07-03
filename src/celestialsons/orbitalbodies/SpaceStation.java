@@ -1,5 +1,5 @@
 
-package orbitalbodies;
+package celestialsons.orbitalbodies;
 
 
 public class SpaceStation extends OrbitalBodies {

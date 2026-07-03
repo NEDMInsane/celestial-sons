@@ -1,7 +1,7 @@
 
 package celestialsons;
 
-import orbitalbodies.*;
+import celestialsons.orbitalbodies.*;
 
 
 public class StarSystem {

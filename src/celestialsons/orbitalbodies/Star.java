@@ -1,4 +1,4 @@
-package orbitalbodies;
+package celestialsons.orbitalbodies;
 
 import celestialsons.DimensionalPosition;
 

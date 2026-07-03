@@ -3,8 +3,8 @@ package celestialsons;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
-import orbitalbodies.*;
-import ship.*;
+import celestialsons.orbitalbodies.*;
+import celestialsons.ship.*;
 
 public class PlayerCharacter {
     private String name;

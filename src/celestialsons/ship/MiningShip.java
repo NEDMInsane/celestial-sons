@@ -1,5 +1,5 @@
 
-package ship;
+package celestialsons.ship;
 
 
 public class MiningShip extends Ship{

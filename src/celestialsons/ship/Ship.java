@@ -1,5 +1,5 @@
 
-package ship;
+package celestialsons.ship;
 
 import java.util.HashMap;
 import celestialsons.DimensionalPosition;

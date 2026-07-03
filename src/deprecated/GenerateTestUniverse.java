@@ -2,8 +2,8 @@
 package celestialsons;
 
 
-import orbitalbodies.Planet;
-import orbitalbodies.Star;
+import celestialsons.orbitalbodies.Planet;
+import celestialsons.orbitalbodies.Star;
 //Using EveOnline names, kill me.
 
 public class GenerateTestUniverse {

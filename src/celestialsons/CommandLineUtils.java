@@ -7,7 +7,7 @@ package celestialsons;
 
 import java.io.IOException;
 import java.util.Scanner;
-import orbitalbodies.*;
+import celestialsons.orbitalbodies.*;
 
 
 public class CommandLineUtils {
