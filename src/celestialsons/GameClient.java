@@ -1007,6 +1007,16 @@ public class GameClient {
             });
             addMouseListener(new MouseAdapter() {
                 @Override
+                public void mousePressed(MouseEvent e) {
+                    handleMousePress(e);
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        handleMousePress(e);
+                    }
+                }
+                @Override
                 public void mouseExited(MouseEvent e) {
                     systemMapMousePoint = null;
                     hoveredOrbitalLabel = null;
