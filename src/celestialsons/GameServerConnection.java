@@ -22,4 +22,6 @@ public interface GameServerConnection {
     NonPlayerCharacter[] getNonPlayerCharacters();
 
     PlayerCharacter[] getPlayerCharacters();
+
+    String getSet();
 }
