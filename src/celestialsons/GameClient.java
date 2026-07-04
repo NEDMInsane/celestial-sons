@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import celestialsons.orbitalbodies.Star;
+import celestialsons.gui.RadarPanel;
+import celestialsons.gui.LwjglRadarPanel;
 
 import static java.lang.Math.clamp;
 
@@ -29,7 +31,8 @@ public class GameClient {
     private final JPanel viewPanel;
     private final CardLayout controlsCardLayout;
     private final JPanel controlsPanel;
-    private final RadarPanel radarPanel;
+    //private final RadarPanel radarPanel;
+    private final LwjglRadarPanel lwjglRadarPanel;
     private final SystemMapPanel systemMapPanel;
     private final StarMapPanel starMapPanel;
     private final StationPanel stationPanel;
@@ -77,7 +80,8 @@ public class GameClient {
         this.viewPanel = new JPanel(this.viewCardLayout);
         this.controlsCardLayout = new CardLayout();
         this.controlsPanel = new JPanel(this.controlsCardLayout);
-        this.radarPanel = new RadarPanel();
+        //this.radarPanel = new RadarPanel();
+        this.lwjglRadarPanel = new LwjglRadarPanel();
         this.systemMapPanel = new SystemMapPanel();
         this.starMapPanel = new StarMapPanel();
         this.serverLabel = new JLabel(" ");
@@ -224,7 +228,8 @@ public class GameClient {
 
         panel.add(header, BorderLayout.PAGE_START);
 
-        this.viewPanel.add(this.radarPanel, "radar");
+        //this.viewPanel.add(this.radarPanel, "radar");
+        this.viewPanel.add(this.lwjglRadarPanel, "radar");
         this.viewPanel.add(buildSystemMapPanel(), "systemMap");
         this.viewPanel.add(this.starMapPanel, "starMap");
         this.viewPanel.add(this.stationPanel, "station");
@@ -468,7 +473,7 @@ public class GameClient {
     private void selectRadarRange(int rangeKm) {
         this.selectedRadarRangeKm = rangeKm;
         this.radarRangeLabel.setText("Radar distance: " + rangeKm + " km");
-        this.radarPanel.repaint();
+        //this.radarPanel.repaint();
     }
 
     private void switchView(String view) {
@@ -488,7 +493,7 @@ public class GameClient {
         this.radarTabButton.setSelected(true);
         this.viewCardLayout.show(this.viewPanel, "radar");
         updateBottomControls();
-        this.radarPanel.repaint();
+        //this.radarPanel.repaint();
     }
 
     private void selectSystemMapView() {
@@ -539,8 +544,21 @@ public class GameClient {
         if (this.systemMapState == null) {
             return;
         }
-
-        this.radarRangeLabel.setText("Radar distance: " + this.selectedRadarRangeKm + " km");
+        /**
+        this.radarPanel.updateData(
+                this.activePlayer,
+                List.of(this.systemMapState.getOrbitalBodies()),
+                List.of(this.systemMapState.getCharacters()),
+                this.selectedRadarRangeKm
+        );
+         **/
+        this.lwjglRadarPanel.updateData(
+                this.activePlayer,
+                List.of(this.systemMapState.getOrbitalBodies()),
+                List.of(this.systemMapState.getCharacters()),
+                this.selectedRadarRangeKm
+        );
+        this.radarRangeLabel.setText(("Radar distance: ") + this.selectedRadarRangeKm + "km");
         this.systemDetailsArea.setText(buildSystemDetailsText());
         this.characterDetailsArea.setText(buildCharacterDetailsText());
         this.flightPlanDetailsArea.setText(buildFlightPlanDetailsText());
@@ -782,208 +800,6 @@ public class GameClient {
         return (dx * dx) + (dy * dy) + (dz * dz);
     }
 
-    private class RadarPanel extends JPanel {
-        private final Timer sweepTimer;
-        private double sweepAngle;
-
-        RadarPanel() {
-            setBackground(new Color(6, 10, 16));
-            this.sweepTimer = new Timer(40, e -> {
-                this.sweepAngle = (this.sweepAngle + 0.03) % (Math.PI * 2.0);
-                repaint();
-            });
-            this.sweepTimer.start();
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-            int width = getWidth();
-            int height = getHeight();
-            int centerX = width / 2;
-            int centerY = height / 2;
-            int radius = Math.max(120, Math.min(width, height) / 2 - 84);
-            DimensionalPosition origin = this.resolvePlayerOrigin();
-
-            g2.setColor(new Color(8, 13, 20));
-            g2.fillRect(0, 0, width, height);
-
-            drawRadarFrame(g2, centerX, centerY, radius);
-            drawRadarGrid(g2, centerX, centerY, radius);
-            drawRadarSweep(g2, centerX, centerY, radius);
-            drawRadarObjects(g2, centerX, centerY, radius, origin);
-            drawRadarShip(g2, centerX, centerY);
-            drawRadarScaleLabels(g2, centerX, centerY, radius);
-            drawRadarTelemetry(g2, centerX, centerY, radius);
-
-            g2.dispose();
-        }
-
-        private DimensionalPosition resolvePlayerOrigin() {
-            if (activePlayer != null && activePlayer.getCurrentLocation() != null) {
-                return activePlayer.getCurrentLocation();
-            }
-            return new DimensionalPosition(0.0, 0.0, 0.0);
-        }
-
-        private void drawRadarFrame(Graphics2D g2, int centerX, int centerY, int radius) {
-            g2.setColor(new Color(14, 24, 20));
-            g2.fillOval(centerX - radius - 14, centerY - radius - 14, (radius + 14) * 2, (radius + 14) * 2);
-
-            g2.setColor(new Color(48, 173, 95));
-            g2.setStroke(new BasicStroke(2f));
-            g2.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
-            g2.setStroke(new BasicStroke(1f));
-            g2.drawOval(centerX - radius + 14, centerY - radius + 14, (radius - 14) * 2, (radius - 14) * 2);
-            g2.drawOval(centerX - radius + 28, centerY - radius + 28, (radius - 28) * 2, (radius - 28) * 2);
-            g2.drawLine(centerX - radius, centerY, centerX + radius, centerY);
-            g2.drawLine(centerX, centerY - radius, centerX, centerY + radius);
-            g2.drawLine(centerX - (int) (radius * 0.707), centerY - (int) (radius * 0.707), centerX + (int) (radius * 0.707), centerY + (int) (radius * 0.707));
-            g2.drawLine(centerX - (int) (radius * 0.707), centerY + (int) (radius * 0.707), centerX + (int) (radius * 0.707), centerY - (int) (radius * 0.707));
-        }
-
-        private void drawRadarGrid(Graphics2D g2, int centerX, int centerY, int radius) {
-            g2.setColor(new Color(48, 173, 95, 80));
-            g2.setStroke(new BasicStroke(1f));
-
-            for (int i = 1; i < 6; i++) {
-                int ringRadius = (int) Math.round(radius * (i / 6.0));
-                g2.drawOval(centerX - ringRadius, centerY - ringRadius, ringRadius * 2, ringRadius * 2);
-            }
-
-            for (int i = 1; i < 12; i++) {
-                double angle = (Math.PI * 2.0 * i) / 12.0;
-                int innerX = centerX + (int) Math.round(Math.cos(angle) * (radius * 0.12));
-                int innerY = centerY + (int) Math.round(Math.sin(angle) * (radius * 0.12));
-                int outerX = centerX + (int) Math.round(Math.cos(angle) * radius);
-                int outerY = centerY + (int) Math.round(Math.sin(angle) * radius);
-                g2.drawLine(innerX, innerY, outerX, outerY);
-            }
-        }
-
-        private void drawRadarSweep(Graphics2D g2, int centerX, int centerY, int radius) {
-            int sweepX = centerX + (int) Math.round(Math.cos(this.sweepAngle) * radius);
-            int sweepY = centerY + (int) Math.round(Math.sin(this.sweepAngle) * radius);
-            g2.setColor(new Color(96, 255, 140, 110));
-            g2.setStroke(new BasicStroke(2f));
-            g2.drawLine(centerX, centerY, sweepX, sweepY);
-            g2.setColor(new Color(96, 255, 140, 35));
-            for (int i = 1; i <= 3; i++) {
-                double angle = this.sweepAngle - (i * 0.10);
-                int x = centerX + (int) Math.round(Math.cos(angle) * radius);
-                int y = centerY + (int) Math.round(Math.sin(angle) * radius);
-                g2.drawLine(centerX, centerY, x, y);
-            }
-        }
-
-        private void drawRadarObjects(Graphics2D g2, int centerX, int centerY, int radius, DimensionalPosition origin) {
-            if (systemMapState == null) {
-                return;
-            }
-
-            for (MapMarker marker : systemMapState.getOrbitalBodies()) {
-                drawRadarMarker(g2, marker.getPosition(), marker.getType(), centerX, centerY, radius, origin);
-            }
-            for (CharacterMarker marker : systemMapState.getCharacters()) {
-                drawRadarMarker(g2, marker.getPosition(), marker.isTransponderActive() ? "Character" : "Silent", centerX, centerY, radius, origin);
-            }
-        }
-
-        private void drawRadarMarker(Graphics2D g2, DimensionalPosition world, String type, int centerX, int centerY, int radius, DimensionalPosition origin) {
-            if (world == null) {
-                return;
-            }
-            double dx = world.getX() - origin.getX();
-            double dz = world.getZ() - origin.getZ();
-            double flatDistance = Math.sqrt((dx * dx) + (dz * dz));
-            if (flatDistance > selectedRadarRangeKm) {
-                return;
-            }
-
-            double normalized = flatDistance / Math.max(1.0, selectedRadarRangeKm);
-            int blipDistance = (int) Math.round(normalized * radius);
-            double angle = Math.atan2(dz, dx);
-            int x = centerX + (int) Math.round(Math.cos(angle) * blipDistance);
-            int y = centerY + (int) Math.round(Math.sin(angle) * blipDistance);
-            double dy = world.getY() - origin.getY();
-            y -= (int) Math.round(Math.max(-24.0, Math.min(24.0, dy / 6.0)));
-
-            Color markerColor;
-            int size;
-            if ("Star".equals(type)) {
-                markerColor = new Color(255, 225, 120);
-                size = 9;
-            } else if ("Planet".equals(type)) {
-                markerColor = new Color(110, 220, 255);
-                size = 7;
-            } else if ("Moon".equals(type)) {
-                markerColor = new Color(160, 240, 255);
-                size = 5;
-            } else if ("Station".equals(type)) {
-                markerColor = new Color(112, 255, 148);
-                size = 7;
-            } else {
-                markerColor = new Color(255, 120, 120);
-                size = 6;
-            }
-
-            int elevation = (int) Math.round(dy);
-            int elevationBarHeight = Math.max(3, Math.min(18, Math.abs(elevation) / 8));
-            int elevationOffset = Integer.compare(elevation, 0) * (size + 3);
-
-            g2.setColor(new Color(12, 18, 16, 160));
-            g2.fillOval(x - size - 2, y - size - 2, (size * 2) + 4, (size * 2) + 4);
-            g2.setColor(markerColor);
-            g2.fillOval(x - size / 2, y - size / 2, size, size);
-
-            g2.setStroke(new BasicStroke(1f));
-            g2.drawLine(x, y + elevationOffset, x, y + elevationOffset - elevationBarHeight * Integer.signum(elevation == 0 ? 1 : elevation));
-        }
-
-        private void drawRadarShip(Graphics2D g2, int centerX, int centerY) {
-            Polygon shipTriangle = new Polygon();
-            shipTriangle.addPoint(centerX, centerY - 12);
-            shipTriangle.addPoint(centerX - 10, centerY + 10);
-            shipTriangle.addPoint(centerX + 10, centerY + 10);
-            g2.setColor(new Color(255, 234, 120));
-            g2.fillPolygon(shipTriangle);
-            g2.setColor(new Color(255, 248, 196));
-            g2.drawPolygon(shipTriangle);
-            g2.fillOval(centerX - 2, centerY - 2, 4, 4);
-        }
-
-        private void drawRadarScaleLabels(Graphics2D g2, int centerX, int centerY, int radius) {
-            g2.setColor(new Color(94, 232, 133));
-            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 12f));
-            int[] rings = rangeValues();
-            for (int i = 0; i < rings.length; i++) {
-                int ringRadius = (int) Math.round(radius * ((i + 1) / 6.0));
-                g2.drawString(rings[i] + " km", centerX + ringRadius - 8, centerY - ringRadius - 6);
-            }
-        }
-
-        private void drawRadarTelemetry(Graphics2D g2, int centerX, int centerY, int radius) {
-            g2.setColor(new Color(94, 232, 133));
-            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 13f));
-            g2.drawString("ELITE SCAN", centerX - radius + 10, centerY + radius + 22);
-            g2.drawString("RANGE " + selectedRadarRangeKm + " KM", centerX + radius - 132, centerY + radius + 22);
-        }
-
-        private int[] rangeValues() {
-            int maxRange = selectedRadarRangeKm;
-            return new int[] {
-                    Math.max(1, maxRange / 5),
-                    Math.max(1, (maxRange * 2) / 5),
-                    Math.max(1, (maxRange * 3) / 5),
-                    Math.max(1, (maxRange * 4) / 5),
-                    maxRange
-            };
-        }
-    }
 
     private class SystemMapPanel extends JPanel {
         SystemMapPanel() {
