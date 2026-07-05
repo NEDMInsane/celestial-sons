@@ -112,7 +112,7 @@ public class CommandLineUtils {
         UniverseGenerator.generateSevenSystemUniverse("testing");
     }
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         if (args != null && args.length > 0 && "generate-universe".equalsIgnoreCase(args[0])) {
             regenerateUniverseCsvs();
             System.out.println("Generated testing/ universe CSV files.");

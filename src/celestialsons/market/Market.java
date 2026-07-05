@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Market {
     //Not all stations will have a traditional celestialsons.market.
-    private String marketStationName;
-    private String marketLocation;
+    private final String marketStationName;
+    private final String marketLocation;
 
     private Contract[] marketData;
 

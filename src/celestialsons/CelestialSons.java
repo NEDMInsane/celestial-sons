@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 
 public class CelestialSons {
     
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             GameServer server = new GameServer();
             GameClient client = new GameClient(server);

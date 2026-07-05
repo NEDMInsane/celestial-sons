@@ -1097,28 +1097,21 @@ public class GameServer implements GameServerConnection {
         return (dx * dx) + (dy * dy) + (dz * dz);
     }
 
-    private static final class OrbitalObstacle {
-        private final DimensionalPosition position;
-        private final double radius;
-
-        private OrbitalObstacle(DimensionalPosition position, double radius) {
-            this.position = position;
-            this.radius = radius;
-        }
+    private record OrbitalObstacle(DimensionalPosition position, double radius) {
 
         private boolean containsPoint(DimensionalPosition point) {
-            if (point == null || this.position == null) {
-                return false;
+                if (point == null || this.position == null) {
+                    return false;
+                }
+                double dx = point.getX() - this.position.getX();
+                double dy = point.getY() - this.position.getY();
+                double dz = point.getZ() - this.position.getZ();
+
+                double distanceSquared = (dx * dx) + (dy * dy) + (dz * dz);
+
+                return distanceSquared <= (this.radius * this.radius);
             }
-            double dx = point.getX() - this.position.getX();
-            double dy = point.getY() - this.position.getY();
-            double dz = point.getZ() - this.position.getZ();
-
-            double distanceSquared = (dx * dx) + (dy * dy) + (dz * dz);
-
-            return distanceSquared <= (this.radius * this.radius);
         }
-    }
 
     private Star resolveSystem(String systemName) {
         if (this.universe == null || systemName == null || systemName.isBlank()) {
@@ -1162,14 +1155,7 @@ public class GameServer implements GameServerConnection {
         }
     }
 
-    private static final class StationAssignment {
-        private final String systemName;
-        private final String stationName;
-
-        private StationAssignment(String systemName, String stationName) {
-            this.systemName = systemName;
-            this.stationName = stationName;
-        }
+    private record StationAssignment(String systemName, String stationName) {
     }
 
     private static final class AccountRecord {
@@ -1180,7 +1166,7 @@ public class GameServer implements GameServerConnection {
         private final String createdAt;
         private String characterName;
         private String shipType;
-        private String systemName;
+        private final String systemName;
         private String stationName;
         private boolean docked;
 

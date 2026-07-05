@@ -12,7 +12,7 @@ Warp/Jump - Used for interstellar travel
 */
 public class Ship {
     private String shipType = "";
-    private HashMap<String, Integer> shipSpecialties = new HashMap<>();
+    private final HashMap<String, Integer> shipSpecialties = new HashMap<>();
     
     private int hardPoints = 0;
     private int launcherSlots = 0;
@@ -24,11 +24,11 @@ public class Ship {
     
     private int impulseMaxSpeed = 0;
     private int harmonicMaxSpeed = 0;
-    private int jumpDriveDist = 0; //Lightyears
+    private final int jumpDriveDist = 0; //Lightyears
     
-    private DimensionalPosition velocity = new DimensionalPosition(0.0, 0.0, 0.0);
-    private DimensionalPosition currentPosition = new DimensionalPosition(0.0, 0.0, 0.0);
-    private DimensionalPosition radarCrossSection = new DimensionalPosition(10.0, 10.0, 10.0);
+    private final DimensionalPosition velocity = new DimensionalPosition(0.0, 0.0, 0.0);
+    private final DimensionalPosition currentPosition = new DimensionalPosition(0.0, 0.0, 0.0);
+    private final DimensionalPosition radarCrossSection = new DimensionalPosition(10.0, 10.0, 10.0);
     
     public void update(){
         currentPosition.add(velocity);

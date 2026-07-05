@@ -11,7 +11,7 @@ import javax.swing.border.BevelBorder;
 
 
 public class GraphicalInterface {
-    private JFrame frame;
+    private final JFrame frame;
     private String name = "";
     private int width = 800;
     private int height = 600;

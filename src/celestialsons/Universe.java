@@ -4,10 +4,10 @@ package celestialsons;
 import celestialsons.orbitalbodies.*;
 
 public class Universe {
-    private Star[] starList;
-    private Planet[] planetList;
-    private Moon[] moonList; // Moons are orbital bodies inside the Planet classes, which are stored in the star classes...
-    private SpaceStation[] stationList;
+    private final Star[] starList;
+    private final Planet[] planetList;
+    private final Moon[] moonList; // Moons are orbital bodies inside the Planet classes, which are stored in the star classes...
+    private final SpaceStation[] stationList;
 
     // Why load all these when the stars each contain their own planet list, which contain the moons...?
     public Universe(Star[] starList, Planet[] planetList, Moon[] moonList){

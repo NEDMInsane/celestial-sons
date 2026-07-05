@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,13 +149,13 @@ public class RadarPanel extends JPanel {
     private void drawRadarObjects(Graphics2D g2, int centerX, int centerY, int radius, DimensionalPosition playerPosition) {
         // Draw orbital bodies
         for (MapMarker marker : orbitalBodies) {
-            drawObject(g2, marker.getPosition(), marker.getType(), centerX, centerY, radius, playerPosition);
+            drawObject(g2, marker.position(), marker.type(), centerX, centerY, radius, playerPosition);
         }
 
         // Draw characters/ships
         for (CharacterMarker marker : characters) {
-            drawObject(g2, marker.getPosition(),
-                    marker.isTransponderActive() ? "Character" : "Silent",
+            drawObject(g2, marker.position(),
+                    marker.transponderActive() ? "Character" : "Silent",
                     centerX, centerY, radius, playerPosition);
         }
     }

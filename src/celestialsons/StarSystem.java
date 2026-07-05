@@ -13,9 +13,9 @@ public class StarSystem {
      */
     
     // The grid is the size of the solar system which is 100k AU^3
-    private DimensionalPosition grid = new DimensionalPosition(100000.0, 100000.0, 100000.0); // This is in AU
+    private final DimensionalPosition grid = new DimensionalPosition(100000.0, 100000.0, 100000.0); // This is in AU
     // The player grid is the grid when a player drops out of hyperspace/cruise.
-    private DimensionalPosition playerGrid = new DimensionalPosition(400000.0, 400000.0, 400000.0); // This in in KM
+    private final DimensionalPosition playerGrid = new DimensionalPosition(400000.0, 400000.0, 400000.0); // This in in KM
     
     private Planet[] planets;
     private Anomaly[] anomalies;

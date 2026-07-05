@@ -1,12 +1,6 @@
 package celestialsons.lwjgl;
 
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -19,7 +13,6 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
 
 import celestialsons.DimensionalPosition;
 import celestialsons.MapMarker;
@@ -57,7 +50,7 @@ public class Radar3D {
     private static final int GRID_SEGMENTS = 16;
     private static final float GRID_HEIGHT_SCALE = 0.5f;
 
-    private long window;
+    private final long window;
     private int shaderProgram;
     private int vaoGrid, vboGrid;
     private int vaoObjects, vboObjects;
@@ -70,9 +63,9 @@ public class Radar3D {
 
     // Camera parameters
     private float cameraAngleX = 0.0f;
-    private float cameraAngleY = 0.0f;
-    private float cameraDistance = 20.0f;
-    private float cameraHeight = 5.0f;
+    private final float cameraAngleY = 0.0f;
+    private final float cameraDistance = 20.0f;
+    private final float cameraHeight = 5.0f;
 
     public Radar3D(long window) {
         this.window = window;
@@ -241,8 +234,8 @@ public class Radar3D {
 
             // Add orbital bodies
             for (MapMarker marker : orbitalBodies) {
-                if (marker.getPosition() != null) {
-                    DimensionalPosition pos = marker.getPosition();
+                if (marker.position() != null) {
+                    DimensionalPosition pos = marker.position();
                     float dx = (float) (pos.getX() - playerPos.getX());
                     float dy = (float) (pos.getY() - playerPos.getY());
                     float dz = (float) (pos.getZ() - playerPos.getZ());
@@ -255,7 +248,7 @@ public class Radar3D {
                         objectVertices.add(dz);
 
                         // Set color based on object type
-                        switch (marker.getType()) {
+                        switch (marker.type()) {
                             case "Star":
                                 objectVertices.add(1.0f); // r
                                 objectVertices.add(0.9f); // g
@@ -288,8 +281,8 @@ public class Radar3D {
 
             // Add characters/ships
             for (CharacterMarker marker : characters) {
-                if (marker.getPosition() != null) {
-                    DimensionalPosition pos = marker.getPosition();
+                if (marker.position() != null) {
+                    DimensionalPosition pos = marker.position();
                     float dx = (float) (pos.getX() - playerPos.getX());
                     float dy = (float) (pos.getY() - playerPos.getY());
                     float dz = (float) (pos.getZ() - playerPos.getZ());
@@ -302,7 +295,7 @@ public class Radar3D {
                         objectVertices.add(dz);
 
                         // Set color based on transponder status
-                        if (marker.isTransponderActive()) {
+                        if (marker.transponderActive()) {
                             objectVertices.add(1.0f); // r
                             objectVertices.add(0.0f); // g
                             objectVertices.add(0.0f); // b
