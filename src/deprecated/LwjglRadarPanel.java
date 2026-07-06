@@ -1,4 +1,5 @@
-package celestialsons.gui;
+/*
+package deprecated;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
@@ -10,11 +11,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.List;
 
-import celestialsons.DimensionalPosition;
 import celestialsons.MapMarker;
 import celestialsons.CharacterMarker;
 import celestialsons.PlayerCharacter;
-import celestialsons.lwjgl.Radar3D;
 
 public class LwjglRadarPanel extends JPanel {
     private long window;
@@ -167,4 +166,4 @@ public class LwjglRadarPanel extends JPanel {
             g.drawString("3D Radar - Initializing...", 10, 20);
         }
     }
-}
+}*/

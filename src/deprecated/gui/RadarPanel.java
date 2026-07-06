@@ -1,4 +1,5 @@
-package celestialsons.gui;
+/*
+package deprecated.gui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -298,4 +299,4 @@ public class RadarPanel extends JPanel {
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 12f));
         g2.drawString("RANGE: " + selectedRadarRangeKm + "KM", centerX + radius - 100, centerY + radius + 30);
     }
-}
+}*/

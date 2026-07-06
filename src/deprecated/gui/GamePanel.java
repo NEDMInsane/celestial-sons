@@ -1,4 +1,4 @@
-package celestialsons.gui;
+package deprecated.gui;
 
 public class GamePanel {
 }

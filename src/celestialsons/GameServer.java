@@ -403,6 +403,11 @@ public class GameServer implements GameServerConnection {
         return this.playerCharacters;
     }
 
+    @Override
+    public String getSet() {
+        return "";
+    }
+
     public PlayerCharacter getActivePlayer(String username) {
         return this.activePlayers.get(normalizeUsername(username));
     }

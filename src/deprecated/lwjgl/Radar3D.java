@@ -1,4 +1,5 @@
-package celestialsons.lwjgl;
+/*
+package deprecated.lwjgl;
 
 import org.lwjgl.system.MemoryStack;
 
@@ -234,8 +235,8 @@ public class Radar3D {
 
             // Add orbital bodies
             for (MapMarker marker : orbitalBodies) {
-                if (marker.position() != null) {
-                    DimensionalPosition pos = marker.position();
+                if (marker.getPosition() != null) {
+                    DimensionalPosition pos = marker.getPosition();
                     float dx = (float) (pos.getX() - playerPos.getX());
                     float dy = (float) (pos.getY() - playerPos.getY());
                     float dz = (float) (pos.getZ() - playerPos.getZ());
@@ -536,4 +537,4 @@ public class Radar3D {
         mat.put(14, 0.0f);
         mat.put(15, 1.0f);
     }
-}
+}*/

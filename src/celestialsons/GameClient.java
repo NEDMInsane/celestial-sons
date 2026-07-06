@@ -1,13 +1,15 @@
 package celestialsons;
 
+import celestialsons.market.Contract;
+import celestialsons.orbitalbodies.Star;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Logger;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -19,7 +21,6 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GameClient {
-
     private static final int[] RADAR_RANGES_KM = {1, 10, 50, 100, 200, 1000};
     private static final double SYSTEM_MAP_SCALE = 1.0;
     private static final double SYSTEM_MAP_PAN_STEP = 120.0;
@@ -27,8 +28,8 @@ public class GameClient {
     private static final int WINDOW_H = 920;
     private static final long STATE_REFRESH_INTERVAL_NANOS = 250_000_000L;
 
-    private static final String FONT_REGULAR_PATH = "assets/fonts/Roboto-Regular.ttf";
-    private static final String FONT_BOLD_PATH = "assets/fonts/Roboto-Bold.ttf";
+    private static final String FONT_REGULAR_PATH = "/home/trux/IdeaProjects/celestial-sons/assets/fonts/Roboto-Bold.ttf";
+    private static final String FONT_BOLD_PATH = "/home/trux/IdeaProjects/celestial-sons/assets/fonts/Roboto-Regular.ttf";
 
     // Palette
     private static final float[] BG_ROOT = rgb(11, 17, 28);
@@ -63,22 +64,22 @@ public class GameClient {
     private String loggedInUsername;
     private SystemMapState systemMapState;
     private StationState stationState;
-    private final String activeView = "login"; // login | radar | systemMap | starMap | station
-    private final String activeDialog = null;  // null | createCharacter | market | shipyard | character
-    private final int selectedRadarRangeKm = 100;
+    private String activeView = "login"; // login | radar | systemMap | starMap | station
+    private String activeDialog = null;  // null | createCharacter | market | shipyard | character
+    private int selectedRadarRangeKm = 100;
     private double mapPanX = 0.0;
     private double mapPanY = 0.0;
-    private final double systemMapZoom = 1.0;
-    private final double starMapZoom = 1.0;
+    private double systemMapZoom = 1.0;
+    private double starMapZoom = 1.0;
     private Double hoverMouseX = null;
     private Double hoverMouseY = null;
     private String hoveredOrbitalLabel = null;
     private long lastStateRefreshNanos = 0L;
-    private final String statusMessage = " ";
+    private String statusMessage = " ";
     private String loginMessage = " ";
 
     // simple context-menu state for the system map (replaces JPopupMenu)
-    private final ContextMenu activeContextMenu = null;
+    private ContextMenu activeContextMenu = null;
 
     public GameClient(GameServerConnection server) {
         this.server = server;
@@ -95,6 +96,7 @@ public class GameClient {
     // -------------------------
 
     private void init() {
+        System.out.println("Initializing GameClient.");
         GLFWErrorCallback.createPrint(System.err).set();
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW.");
@@ -131,6 +133,7 @@ public class GameClient {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
         glfwShowWindow(window);
+        System.out.println("GLFW Window created.");
 
         GL.createCapabilities();
         glEnable(GL_MULTISAMPLE);
@@ -167,11 +170,11 @@ public class GameClient {
                 if (action == GLFW_PRESS) {
                     ui.mouseDown = true;
                     ui.mousePressedThisFrame = true;
-                } else if (acion == GLFW_RELEASE) {
+                } else if (action == GLFW_RELEASE) {
                     ui.mouseDown = false;
                 }
-            } else if (buton == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-                ui.rightMouseButtonPressedThisFrame = true;
+            } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+                ui.rightMousePressedThisFrame = true;
             }
         });
 
@@ -218,28 +221,27 @@ public class GameClient {
                 refreshActiveState();
                 lastStateRefreshNanos = now;
             }
+
+            glViewport(0, 0, windowWidth, windowHeight);
+            glClearColor(0f, 0f, 0f, 1f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            try (MemoryStack stack = stackPush()) {
+                IntBuffer pWidth = stack.mallocInt(1);
+                IntBuffer pHeight = stack.mallocInt(1);
+                glfwGetFramebufferSize(window, pWidth, pHeight);
+                float pxRatio = pWidth.get(0) > 0 ? (float) pWidth.get(0) / windowWidth : 1f;
+
+                nvgBeginFrame(vg, windowWidth, windowHeight, pxRatio);
+                render();
+                nvgEndFrame(vg);
+            }
+
+            ui.endFrame();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
         }
-
-        glViewport(0, 0, windowWidth, windowHeight);
-        glClearColor(0f, 0f, 0f, 1f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-            glfwGetFramebufferSize(window, pWidth, pHeight);
-            float pxRatio = pWidth.get(0) > 0 ? (float) pWidth.get(0) / windowWidth : 1f;
-
-            nvgBeginFrame(vg, windowWidth, windowHeight, pxRatio);
-            render();
-            nvgEndFrame(vg);
-        }
-
-        ui.endFrame();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
     }
-
     private void cleanup() {
         nnvgDelete(vg);
         glfwFreeCallbacks(window);
@@ -283,7 +285,7 @@ public class GameClient {
         panel(formX, formY, formW, formH, BG_FORM, BORDER_SOFT);
 
         float pad = 24;
-        float x = formx + pad;
+        float x = formX + pad;
         float y = formY + pad + 10;
 
         text(x, y, "Celestial Sons", 28, fontBold, TEXT_TITLE);
@@ -307,7 +309,7 @@ public class GameClient {
         y += 26;
 
         boolean submit = ui.button(vg, "login.submit", x, y, 120, 34, "Login", fontBold, BG_BUTTON, false);
-        if (submit || (uieterConsumedThisWidget("login.password") && ui.enterRequested)) {
+        if (submit || (ui.enterConsumedThisWidget("login.password") && ui.enterRequested)) {
             attemptLogin();
         }
     }
@@ -330,9 +332,9 @@ public class GameClient {
         this.loginMessage = result.getMessage();
         this.stationState = this.server.getStationState(this.loggedInUsername);
 
-        if (this.stationState != null && !this.stationState.characterCreated()) {
+        if (this.stationState != null && !this.stationState.isCharacterCreated()) {
             openCreateCharacterDialog();
-        } else if (this.stationState != null && this.stationState.docked()) {
+        } else if (this.stationState != null && this.stationState.isDocked()) {
             refreshDockedState();
             selectStationView();
         } else {
@@ -357,13 +359,13 @@ public class GameClient {
 
         switch (activeView) {
             case "radar" -> renderRadarView(0, viewY, windowWidth, viewH);
-            case "SystemMap" -> renderSystemMap(0, viewY, windowWidth, viewH);
+            case "SystemMap" -> renderSystemMapView(0, viewY, windowWidth, viewH);
             case "starMap" -> renderStarMapView(0, viewY, windowWidth, viewH);
             case "station" -> renderStationView(0, viewY, windowWidth, viewH);
             default -> renderRadarView(0, viewY, windowWidth, viewH);
         }
 
-        boolean docked = stationState != null && stationState.docked();
+        boolean docked = stationState != null && stationState.isDocked();
         fillRect(0, windowHeight - CONTROLS_H, windowWidth, CONTROLS_H, BG_HEADER);
         if (docked) {
             renderDockedControls(0, windowHeight - CONTROLS_H, windowWidth, CONTROLS_H);
@@ -378,8 +380,8 @@ public class GameClient {
         float y = 26;
         text(x, y, "Celestial Sons", 22, fontBold, TEXT_WHITE);
         y += 26;
-        string pilotLine = activePlayer != null ? "Pilot: " + safeName(activePlayer) : " ";
-        text(x, y, pilotLine, 14, TEXT_BODY);
+        String pilotLine = activePlayer != null ? "Pilot: " + safeName(activePlayer) : " ";
+        text(x, y, pilotLine, 14, fontRegular, TEXT_BODY);
         y += 22;
         text(x, y, locationLine(), 14, fontRegular, TEXT_MUTED);
         y += 22;
@@ -393,6 +395,16 @@ public class GameClient {
             e.printStackTrace();
             return loggedInUsername;
         }
+    }
+
+    private String locationLine() {
+        if (stationState != null && stationState.isDocked()) {
+            return "Docked at: " + stationState.getStationName() + " / " + stationState.getSystemName();
+        }
+        if (systemMapState != null) {
+            return "System: " + systemMapState.getSystemName();
+        }
+        return " ";
     }
 
     // --------------------------------
@@ -487,22 +499,22 @@ public class GameClient {
             if (selfName != null && marker.getName().equals(selfName)) {
                 continue;
             }
-            string type = marker.isTransponderActive() ? "ShipFriendly" : "ShipUnknown";
+            String type = marker.isTransponderActive() ? "ShipFriendly" : "ShipUnknown";
             addRadarContact(contacts, marker.getName(), type, marker.getPosition(), playerPos, rangeKm);
         }
 
         // farthest first, so nearer blips draw on top
-        contacts.sort((a, b) -> double.compare(b.distance, a.distance));
+        contacts.sort((a, b) -> Double.compare(b.distance, a.distance));
 
         hoveredRadarContact = null;
         double bestHoverDist = 14.0;
         float[][] blipScreenPoints = new float[contacts.size()][];
         for (int i = 0; i < contacts.size(); i++) {
             RadarContact c = contacts.get(i);
-            float points = radarContactScreenPoints(centerX, centerY, scale, c);
-            blipsScreenPoints[i] = points;
+            float[] points = radarContactScreenPoints(centerX, centerY, scale, c);
+            blipScreenPoints[i] = points;
             if ("radar".equals(activeView) && activeDialog == null) {
-                double d = math.hypot(ui.mouseX - points[2], ui.mouseY - points[3]);
+                double d = Math.hypot(ui.mouseX - points[2], ui.mouseY - points[3]);
                 if (d < bestHoverDist) {
                     bestHoverDist = d;
                     hoveredRadarContact = c.name;
@@ -535,7 +547,7 @@ public class GameClient {
             nvgStrokeWidth(vg, outer ? 1.6f : 1f);
             nvgStroke(vg);
 
-            int km = (int) math.round(rangeKm * i / RADAR_RING_COUNT);
+            int km = (int) Math.round(rangeKm * i / RADAR_RING_COUNT);
             float lx = cx + r * 0.70f;
             float ly = cy - (r * RADAR_SQUASH * 0.70f);
             text(lx, ly, km + " km", 11, fontRegular, color(140, 205, 215, 200));
@@ -662,12 +674,12 @@ public class GameClient {
     private void renderSystemMapView(float x, float y, float w, float h) {
         float mapW = w - SIDE_PANEL_W;
         renderSystemMapCanvas(x, y, mapW, h);
-        renerSystemMapSidePanel(x + mapW, y, SIDE_PANEL_W, h);
+        renderSystemMapSidePanel(x + mapW, y, SIDE_PANEL_W, h);
 
         if (activeDialog == null && ui.mousePressedThisFrame && ui.mouseX < mapW) {
-            handleSystemMapClick(ui.mpiseX, ui.mouseY - y);
+            handleSystemMapClick(ui.mouseX, ui.mouseY - y);
         }
-        if (activeDialog == null && ui.rightMousePressedThisFrame && ui.mouseX < mapw) {
+        if (activeDialog == null && ui.rightMousePressedThisFrame && ui.mouseX < mapW) {
             openSystemMapContextMenu(ui.mouseX, ui.mouseY - y);
         }
         if (activeDialog == null && ui.scrollDeltaY != 0 && ui.mouseX < mapW) {
@@ -706,15 +718,15 @@ public class GameClient {
     private void drawGrid(float x, float y, float w, float h, float centerX, float centerY,
                           double viewportCenterX, double viewportCenterY) {
         int spacing = Math.max(60, (int) Math.round(120 * systemMapZoom));
-        nvgStrokeColor(vg, color(24, 34, 48));
+        nvgStrokeColor(vg, toNvg(color(24, 34, 48)));
         nvgStrokeWidth(vg, 1f);
-        for (float gx = centerx % spacing; gx < x + w; gx += spacing) {
+        for (float gx = centerX % spacing; gx < x + w; gx += spacing) {
             line(gx, y, gx, y + h);
         }
         for (float gy = centerY % spacing; gy < y + h; gy += spacing) {
             line(x, gy, x + w, gy);
         }
-        nvgStrokeColor(vg, color(45, 62, 84));
+        nvgStrokeColor(vg, toNvg(color(45, 62, 84)));
         line(centerX, y, centerX, y + h);
         line(x, centerY, x + w, centerY);
 
@@ -750,9 +762,24 @@ public class GameClient {
         }
     }
 
+    private void drawCharacters(float centerX, float centerY, double viewportCenterX, double viewportCenterY) {
+        for (CharacterMarker marker : systemMapState.getCharacters()) {
+            float[] p = project(marker.getPosition(), viewportCenterX, viewportCenterY, centerX, centerY);
+            boolean isSelf = activePlayer != null && marker.getName().equals(safeName(activePlayer));
+            if (isSelf) {
+                triangleFill(p[0], p[1] - 9, p[0] - 8, p[1] + 9, p[0] + 8, p[1] + 9, color(255, 226, 95));
+                text(p[0] + 10, p[1] + 4, marker.getName() + " (you)", 13, fontRegular, TEXT_WHITE);
+            } else {
+                float[] c = marker.isTransponderActive() ? color(92, 255, 155) : color(122, 137, 153);
+                circleFill(p[0], p[1], 5, c);
+                text(p[0] + 10, p[1] + 4, marker.getName(), 13, fontRegular, TEXT_WHITE);
+            }
+        }
+    }
+
     // TODO: drawFlightPlans - change colors to variable.
     private void drawFlightPlans(float centerX, float centerY, double viewportCenterX, double viewportCenterY) {
-        for (FlightplanMarker marker : systemMapState.getFlightPlans()) {
+        for (FlightPlanMarker marker : systemMapState.getFlightPlans()) {
             DimensionalPosition[] waypoints = marker.getWaypoints();
             if (waypoints.length == 0) {
                 continue;
@@ -822,7 +849,7 @@ public class GameClient {
             return;
         }
         List<ContextMenu.Item> items = new ArrayList<>();
-        items.add(new contextMenu.Item("File Fight Plan", () -> requestFlightPlan(marker.getPosition())));
+        items.add(new ContextMenu.Item("File Fight Plan", () -> requestFlightPlan(marker.getPosition())));
         activeContextMenu = new ContextMenu(screenX, screenY + HEADER_H, items);
     }
 
@@ -835,7 +862,7 @@ public class GameClient {
             }
         }));
         items.add(new ContextMenu.Item("Fly to Station Approach", () -> {
-            requestFlightPlan(marker.getPosition())
+            requestFlightPlan(marker.getPosition());
         }));
         activeContextMenu = new ContextMenu(screenX, screenY + HEADER_H, items);
     }
@@ -852,10 +879,10 @@ public class GameClient {
     }
 
     boolean canDockAtStation(MapMarker marker) {
-        if (systemMapState == null || marker == null || marker.getposition() == null) {
+        if (systemMapState == null || marker == null || marker.getPosition() == null) {
             return false;
         }
-        return distance(systemMapState.getPlaterPosition(), marker.getPosition()) <= 30;
+        return distance(systemMapState.getPlayerPosition(), marker.getPosition()) <= 30;
     }
 
     private MapMarker findOrbitalMarker(double screenX, double screenY) {
@@ -865,23 +892,754 @@ public class GameClient {
         float mapW = windowWidth - SIDE_PANEL_W;
         float centerX = mapW / 2f;
         float centerY = (windowHeight - HEADER_H - CONTROLS_H) / 2f;
-        double viewportCenterX = systemMapState.getplayerPosition().getX() + mapPanX;
+        double viewportCenterX = systemMapState.getPlayerPosition().getX() + mapPanX;
         double viewportCenterY = systemMapState.getPlayerPosition().getY() + mapPanY;
 
         MapMarker best = null;
-        double destDistance = Double.MAX_VALUE;
+        double bestDistance = Double.MAX_VALUE;
         for (MapMarker marker : systemMapState.getOrbitalBodies()) {
             float[] p = project(marker.getPosition(), viewportCenterX, viewportCenterY, centerX, centerY);
             double d = Math.hypot(screenX - p[0], screenY - p[1]);
+            if (d < 16.0 && d < bestDistance) {
+                best = marker;
+                bestDistance = d;
+            }
+        }
+        return best;
+    }
 
+    private String findHoveredOrbitalLabel(double mouseX, double mouseY) {
+        if (systemMapState == null || !"systemMap".equals(activeView)) {
+            return null;
+        }
+        double screenY = mouseY - HEADER_H;
+        MapMarker marker = findOrbitalMarker(mouseX, screenY);
+        return marker == null ? null : marker.getName();
+    }
+
+    private DimensionalPosition screenToWorld(double screenX, double screenY) {
+        float mapW = windowWidth - SIDE_PANEL_W;
+        float mapH = windowHeight - HEADER_H - CONTROLS_H;
+        double scale = SYSTEM_MAP_SCALE * systemMapZoom;
+        double viewportCenterX = systemMapState.getPlayerPosition().getX() + mapPanX;
+        double viewportCenterY = systemMapState.getPlayerPosition().getY() + mapPanY;
+        return new DimensionalPosition(
+                viewportCenterX + ((screenX - (mapW / 2.0)) / scale),
+                viewportCenterY + ((screenY - (mapH / 2.0)) / scale),
+                systemMapState.getPlayerPosition().getZ()
+        );
+    }
+
+    private float[] project(DimensionalPosition world, double viewportCenterX, double viewportCenterY,
+                            float centerX, float centerY) {
+        double scale = SYSTEM_MAP_SCALE * systemMapZoom;
+        float x = centerX + (float) ((world.getX() - viewportCenterX) * scale);
+        float y = centerY + (float) ((world.getY() - viewportCenterY) * scale);
+        return new float[]{x, y};
+    }
+
+    // ---------------------------------
+    // STAR MAP VIEW
+    // ----------------------------------
+
+    private void renderStarMapView(float x, float y, float w, float h) {
+        fillRect(x, y, w, h, BG_MAP);
+
+        if (activeDialog == null && ui.scrollDeltaY != 0) {
+            starMapZoom = clampD(starMapZoom - (ui.scrollDeltaY * 0.08), 0.35, 4.0);
+        }
+
+        Universe universe = server.getUniverse();
+        Star[] stars = universe == null ? null : universe.getStarList();
+        if (stars == null || stars.length == 0) {
+            text(x + 20, y + 24, "No star map data available.", 14, fontRegular, TEXT_WHITE);
+            return;
+        }
+
+        double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+        for (Star star : stars) {
+            if (star == null || star.getPosition() == null) continue;
+            minX = Math.min(minX, star.getPosition().getX());
+            maxX = Math.max(maxX, star.getPosition().getX());
+            minY = Math.min(minY, star.getPosition().getY());
+            maxY = Math.max(maxY, star.getPosition().getY());
+        }
+        double mapWidth = Math.max(1.0, maxX - minX);
+        double mapHeight = Math.max(1.0, maxY - minY);
+        double scale = Math.min((w - 120.0) / mapWidth, (h - 120.0) / mapHeight) * starMapZoom;
+        if (Double.isInfinite(scale) || Double.isNaN(scale) || scale <= 0) {
+            scale = 1.0;
+        }
+
+        float offsetX = x + 60;
+        float offsetY = y + 60;
+        String currentSystemName = activePlayer != null && activePlayer.getCurrentSystem() != null ?
+                activePlayer.getCurrentSystem().getName() :
+                (stationState != null ? stationState.getSystemName() : "");
+
+        text(x = 20, y + 24, "Star Map", 14, fontRegular, TEXT_MUTED);
+        text(x + 20, y + 42, "Systems loaded: " + stars.length, 14, fontRegular, TEXT_MUTED);
+        if (!currentSystemName.isBlank()) {
+            text(x + 20, y + 60, "Current system: " + currentSystemName, 14, fontRegular, TEXT_MUTED);
+        }
+
+        for (Star star : stars) {
+            if (star == null || star.getPosition() == null) continue;
+            float sx = (float) (offsetX + (star.getPosition().getX() - minX) * scale);
+            float sy = (float) (offsetY + (star.getPosition().getY() - minY) * scale);
+            boolean current = star.getName() != null && star.getName().equals(currentSystemName);
+            float size = current ? 12 : 7;
+            circleFill(sx, sy, size / 2f, current ? color(255, 221, 102) : color(118, 168, 255));
+            int planetCount = star.getPlanets() == null ? 0 : star.getPlanets().length;
+            text(sx + 8, sy - 4, star.getName() + " (" + planetCount + ")", 13, fontRegular, TEXT_WHITE);
         }
     }
 
-    public String getHoveredRadarContact() {
-        return hoveredRadarContact;
+    // ---------------------------------------
+    // STATION VIEW
+    // ---------------------------------------
+
+    private static final float STATION_MENU_W = 260;
+
+    private void renderStationView(float x, float y, float w, float h) {
+        fillRect(x, y, w, h, color(7, 10, 24)); // maybe RGB?
+        renderStationMenu(x, y, STATION_MENU_W, h);
+        renderStationSilhouette(x + STATION_MENU_W, y, w - STATION_MENU_W, h);
     }
 
-    public void setHoveredRadarContact(String hoveredRadarContact) {
-        this.hoveredRadarContact = hoveredRadarContact;
+    private void renderStationMenu(float x, float y, float w, float h) {
+        fillRect(x, y, w, h, color(12, 16, 24)); // maybe RGB?
+        float px = x + 16;
+        float py = y + 30;
+        text(px, py, "Station Tasks", 15, fontBold, TEXT_WHITE);
+        py += 30;
+
+        String characterLabel = (stationState != null && stationState.isCharacterCreated()) ?
+                "Character" : "Create Character";
+        if (ui.button(vg, "station.character", px, py, w -32, 36, characterLabel, fontRegular, BG_BUTTON, false)) {
+            openCharacterSheet();
+        }
+        py += 46;
+        if (ui.button(vg, "station.market", px, py, w - 32, 36, "Market", fontRegular, BG_BUTTON, false)) {
+            openMarketDialog();
+        }
+        py += 46;
+        if (ui.button(vg, "station.shipyard", px, py, w -32, 36, "Shipyard", fontRegular, BG_BUTTON, false)) {
+            openShipyardDialog();
+        }
+    }
+
+    private void renderStationSilhouette(float x, float y, float w, float h) {
+        fillRect(x, y, w, h, color(8, 12, 18)); // maybe RGB?
+
+        String stationName = stationState == null ? "Station" : stationState.getStationName();
+        String systemName = stationState == null ? "Unknown System" : stationState.getSystemName();
+
+        float watermarkSize = 76;
+        float tw = textWidth(stationName, watermarkSize, fontBold);
+        text(x + Math.max(20, (w - tw) / 2f), y + h / 2f, stationName, watermarkSize, fontBold, color(255, 255, 255, 18));
+
+        float ringRadius = Math.min(w, h) / 3f;
+        circleStroke(x + w / 2f, y + h / 2f, ringRadius, color(255, 255, 255, 35));
+        nvgStrokeColor(vg, toNvg(color(255, 255, 255, 35)));
+        nvgStrokeWidth(vg, 3f);
+        line(x + w / 2f - ringRadius, y + h / 2f, x + w / 2f + ringRadius, y + h / 2f);
+
+        text(x + 24, y + 32, systemName, 20, fontBold, TEXT_TITLE);
+        text(x + 24, y + 56, "Docked at " + stationName, 16, fontRegular, TEXT_TITLE);
+        if (stationState != null && stationState.getPlayerName() != null && !stationState.getPlayerName().isBlank()) {
+            text(x + 24, y + 80, "Pilot: " + stationState.getPlayerName(), 16, fontRegular, TEXT_TITLE);
+            text(x + 24, y + 104, "Ship: " + stationState.getShipType(), 16, fontRegular, TEXT_TITLE);
+        }
+    }
+
+    // -----------------------------------------
+    // DIALOGS MODAL OVERLAYS
+    // -----------------------------------------
+
+    private final StringBuilder characterNameBuffer = new StringBuilder();
+    private String[] shipOptions = new String[]{"Shuttle"};
+    private int selectedShipIndex = 0;
+    private String dialogMessage = null;
+
+    private void openCreateCharacterDialog() {
+        if (this.stationState == null) {
+            this.stationState = this.server.getStationState(this.loggedInUsername);
+        }
+        characterNameBuffer.setLength(0);
+        characterNameBuffer.append(loggedInUsername == null ? "" : loggedInUsername);
+        shipOptions = (stationState == null || stationState.getShipOptions() == null ||
+                stationState.getShipOptions().length == 0) ?
+                new String[]{"Shuttle"} : stationState.getShipOptions();
+        selectedShipIndex = 0;
+        dialogMessage = null;
+        activeDialog = "createCharacter";
+    }
+
+    private void openMarketDialog() {
+        stationState = server.getStationState(loggedInUsername);
+        if (stationState == null) return;
+        activeDialog = "market";
+    }
+
+    private void openShipyardDialog() {
+        stationState = server.getStationState(loggedInUsername);
+        if (stationState == null) return;
+        activeDialog = "shipyard";
+    }
+
+    private void openCharacterSheet() {
+        if (stationState == null || !stationState.isCharacterCreated() || activePlayer == null) {
+            openCreateCharacterDialog();
+            return;
+        }
+        activeDialog = "character";
+    }
+
+    private void renderDialogOverlay() {
+        fillRect(0, 0, windowWidth, windowHeight, color(0, 0, 0, 140));
+
+        float dw = 460, dh = 300;
+        float dx = (windowWidth - dw) / 2f;
+        float dy =  (windowHeight - dh) / 2f;
+
+        switch (activeDialog) {
+            case "createCharacter" -> renderCreateCharacterDialog(dx, dy, dw, dh);
+            case "market" -> renderMarketDialog(dx, dy, 640, 420);
+            case "shipyard" -> renderShipyardDialog(dx, dy, dw, dh);
+            case "character" -> renderCharacterDialog(dx, dy, dw, dh);
+            default -> activeDialog = null;
+        }
+    }
+
+    private void renderCreateCharacterDialog(float dx, float dy, float dw, float dh) {
+        panel(dx, dy, dw, dh, rgb(18, 24, 36), BORDER_SOFT);
+        float x = dx + 18, y = dy + 30;
+        text(x, y, "Create your Pilot", 18, fontBold, TEXT_WHITE);
+        y += 34;
+
+        text(x, y, "Character Name", 14, fontRegular, TEXT_WHITE);
+        ui.textField(vg, "createChar.name", x + 160, y -16, dw -36 - 160, 26, characterNameBuffer, false, fontRegular);
+        y += 40;
+
+        text(x, y, "Ship", 14, fontRegular, TEXT_WHITE);
+        for (int i = 0; i < shipOptions.length; i++) {
+            boolean selected = i == selectedShipIndex;
+            float bw = textWidth(shipOptions[i], 13, fontRegular) + 24;
+            float bx = x + 160 + i * (bw + 8);
+            if (ui.button(vg, "createChar.ship." + i, bx, y-16, bw, 26, shipOptions[i], fontRegular, selected ?
+                    BG_BUTTON_ACTIVE : BG_BUTTON, selected)) {
+                selectedShipIndex = i;
+            }
+        }
+        y += 40;
+
+        if (dialogMessage != null) {
+            text(x, y, dialogMessage, 13, fontRegular, TEXT_WARNING);
+            y += 24;
+        }
+
+        if (ui.button(vg, "createChar.submit", x, y, 120, 34, "Create", fontBold, BG_BUTTON, false)) {
+            CharacterCreationResult creation = server.createCharacter(
+                    loggedInUsername,
+                    characterNameBuffer.toString().trim(),
+                    shipOptions[selectedShipIndex]
+            );
+            if (!creation.isSuccess()) {
+                dialogMessage = creation.getMessage();
+            } else {
+                activePlayer = creation.getPlayerCharacter();
+                stationState = server.getStationState(loggedInUsername);
+                activeDialog = null;
+                refreshDockedState();
+                selectStationView();
+            }
+        }
+        if (ui.button(vg, "createChar.cancel", x + 130, y, 100, 34, "Cancel", fontRegular, BG_BUTTON, false)) {
+            activeDialog = null;
+        }
+    }
+
+    private void renderMarketDialog(float dx, float dy, float dw, float dh) {
+        panel(dx, dy, dw, dh, rgb(18, 24, 36), BORDER_SOFT);
+        text(dx + 16, dy + 26, "Market", 16, fontBold, TEXT_WHITE);
+
+        StringBuilder text = new StringBuilder();
+        Contract[] contracts = stationState == null ? null : stationState.getMarketContracts();
+        if (contracts != null) {
+            for (Contract contract : contracts) {
+                text.append(contract.getItemName())
+                        .append(" x").append(contract.getQuantity())
+                        .append(" @ ").append(contract.getPricePerUnit())
+                        .append(" from ").append(contract.getSellingParty())
+                        .append('\n');
+            }
+        }
+        ui.scrollableText(vg, "market.contracts", dx + 16, dy + 40, dw - 32, dh - 80, text.toString(), 13, fontRegular, TEXT_BODY);
+
+        if (ui.button(vg, "market.close", dx + dw - 100 - 16, dy + dh - 44, 100, 32, "Close", fontRegular, BG_BUTTON, false)) {
+            activeDialog = null;
+        }
+    }
+
+    private void renderShipyardDialog(float dx, float dy, float dw, float dh) {
+        panel(dx, dy, dw, dh, rgb(18, 24, 36), BORDER_SOFT);
+        text(dx + 16, dy + 26, "Shipyard", 16, fontBold, TEXT_WHITE);
+        String ships = stationState == null ? "" : String.join(", ", stationState.getShipOptions());
+        text(dx + 16, dy + 56, "Available ships:", 14, fontRegular, TEXT_BODY);
+        ui.scrollableText(vg, "shipyard.list", dx + 16, dy + 70, dw - 32, dh - 110, ships, 13, fontRegular, TEXT_BODY);
+        if (ui.button(vg, "shipyard.close", dx + dw - 100 - 16, dy + dh - 44, 100, 32, "Close", fontRegular, BG_BUTTON, false)) {
+            activeDialog = null;
+        }
+    }
+
+    private void renderCharacterDialog(float dx, float dy, float dw, float dh) {
+        panel(dx, dy, dw, dh, rgb(18, 24, 36), BORDER_SOFT);
+        text(dx + 16, dy + 26, "Character", 16, fontBold, TEXT_WHITE);
+        String pilot = activePlayer == null ? loggedInUsername : safeName(activePlayer);
+        String shipType = activePlayer == null ? "Unknown" : activePlayer.getShipType();
+        text(dx + 16, dy + 56, "Pilot: " + pilot, 14, fontRegular, TEXT_BODY);
+        text(dx + 16, dy + 78, "Ship: " + shipType, 14, fontRegular, TEXT_BODY);
+        if (ui.button(vg, "character.close", dx + dw - 100 - 16, dy + dh - 44, 100, 32, "Close", fontRegular, BG_BUTTON, false)) {
+            activeDialog = null;
+        }
+    }
+
+    // ------------------------------
+    // CONTEXT MENU
+    // ------------------------------
+
+    private void renderContextMenu() {
+        double x = activeContextMenu.x;
+        double y = activeContextMenu.y;
+        float itemH = 28;
+        float w = 200;
+        float h = itemH * activeContextMenu.items.size();
+
+        panel((float) x, (float) y, w, h, rgb(24, 32, 48), BORDER_SOFT);
+        for (int i = 0; i < activeContextMenu.items.size(); i++) {
+            ContextMenu.Item item = activeContextMenu.items.get(i);
+            float iy = (float) y + i * itemH;
+            boolean hovered = ui.mouseX >= x && ui.mouseX <= x + w && ui.mouseY >= iy && ui.mouseY <= iy + itemH;
+            if (hovered) {
+                fillRect((float) x, iy, w, itemH, BG_BUTTON_ACTIVE);
+            }
+            text((float) x + 10, iy + 19, item.label, 13, fontRegular, TEXT_WHITE);
+            if (hovered && ui.mousePressedThisFrame) {
+                item.action.run();
+                activeContextMenu = null;
+            }
+        }
+
+        if (ui.mousePressedThisFrame && (ui.mouseX < x || ui.mouseX > x + w || ui.mouseY < y || ui.mouseY > y + h)) {
+            activeContextMenu = null;
+        }
+    }
+
+    private static class ContextMenu {
+        final double x;
+        final double y;
+        final List<Item> items;
+
+        ContextMenu(double x, double y, List<Item> items) {
+            this.x = x;
+            this.y = y;
+            this.items = items;
+        }
+
+        static class Item {
+            final String label;
+            final Runnable action;
+
+            Item(String label, Runnable action) {
+                this.label = label;
+                this.action = action;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // VIEW / MODE SWITCHING
+    // ------------------------------------------------------------------
+
+    private void selectRadarRange(int rangeKm) {
+        this.selectedRadarRangeKm = rangeKm;
+    }
+
+    private void switchView(String view) {
+        switch (view) {
+            case "systemMap" -> selectSystemMapView();
+            case "starMap" -> selectStarMapView();
+            case "station" -> selectStationView();
+            default -> selectRadarView();
+        }
+    }
+
+    private void selectRadarView() {
+        this.activeView = "radar";
+        this.statusMessage = "Radar scope active";
+    }
+
+    private void selectSystemMapView() {
+        this.activeView = "systemMap";
+        refreshSpaceState();
+        this.statusMessage = "System map active - arrow keys pan the view";
+    }
+
+    private void selectStarMapView() {
+        this.activeView = "starMap";
+        this.statusMessage = "Star map active";
+    }
+
+    private void selectStationView() {
+        this.activeView = "station";
+        this.statusMessage = "Docked and in station";
+    }
+
+    private void refreshSpaceState() {
+        if (this.loggedInUsername == null) {
+            return;
+        }
+        this.systemMapState = this.server.getSystemMapState(this.loggedInUsername);
+    }
+
+    private void refreshDockedState() {
+        if (this.loggedInUsername == null) {
+            return;
+        }
+        this.stationState = this.server.getStationState(this.loggedInUsername);
+        if (this.stationState == null) {
+            return;
+        }
+        this.statusMessage = "Docked and in station";
+    }
+
+    private void handleUndock() {
+        if (this.loggedInUsername == null) {
+            return;
+        }
+        this.server.undock(this.loggedInUsername);
+        this.stationState = this.server.getStationState(this.loggedInUsername);
+        refreshSpaceState();
+        selectRadarView();
+    }
+
+    private void refreshActiveState() {
+        if (this.loggedInUsername == null || "login".equals(this.activeView)) {
+            return;
+        }
+        if ("station".equals(this.activeView)) {
+            refreshDockedState();
+        } else {
+            refreshSpaceState();
+        }
+    }
+    // ------------------------------------------------------------------
+    // TEXT BUILDERS
+    // ------------------------------------------------------------------
+
+    private String buildSystemDetailsText() {
+        if (this.systemMapState == null) {
+            return "";
+        }
+        StringBuilder text = new StringBuilder();
+        text.append("Server: ").append(this.systemMapState.getServerName()).append('\n');
+        text.append("System: ").append(this.systemMapState.getSystemName()).append('\n');
+        text.append("Player position: ").append(formatPosition(this.systemMapState.getPlayerPosition())).append('\n');
+        text.append("Orbital bodies:\n");
+        for (MapMarker marker : this.systemMapState.getOrbitalBodies()) {
+            text.append(" - ").append(marker.getType()).append(" ").append(marker.getName())
+                    .append(" @ ").append(formatPosition(marker.getPosition())).append('\n');
+        }
+        return text.toString();
+    }
+
+    private String buildCharacterDetailsText() {
+        if (this.systemMapState == null) {
+            return "";
+        }
+        StringBuilder text = new StringBuilder();
+        for (CharacterMarker marker : this.systemMapState.getCharacters()) {
+            text.append(marker.getName());
+            text.append(marker.isTransponderActive() ? " [transponder active]" : " [transponder off]");
+            text.append(" @ ").append(formatPosition(marker.getPosition())).append('\n');
+        }
+        return text.toString();
+    }
+
+    private String buildFlightPlanDetailsText() {
+        if (this.systemMapState == null) {
+            return "";
+        }
+        StringBuilder text = new StringBuilder();
+        for (FlightPlanMarker marker : this.systemMapState.getFlightPlans()) {
+            text.append(marker.getOwnerName()).append(": ").append(marker.getLabel()).append('\n');
+            DimensionalPosition[] waypoints = marker.getWaypoints();
+            for (int i = 0; i < waypoints.length; i++) {
+                text.append("  ").append(i + 1).append(". ").append(formatPosition(waypoints[i])).append('\n');
+            }
+        }
+        return text.toString();
+    }
+
+    private String formatPosition(DimensionalPosition position) {
+        if (position == null) {
+            return "(unknown)";
+        }
+        return String.format("(%.1f, %.1f, %.1f)", position.getX(), position.getY(), position.getZ());
+    }
+
+    private String formatPosition2D(double x, double y) {
+        return String.format("(%.1f, %.1f)", x, y);
+    }
+
+    private double distance(DimensionalPosition a, DimensionalPosition b) {
+        return Math.sqrt(distanceSquared(a, b));
+    }
+
+    private double distanceSquared(DimensionalPosition a, DimensionalPosition b) {
+        if (a == null || b == null) {
+            return Double.MAX_VALUE;
+        }
+        double dx = a.getX() - b.getX();
+        double dy = a.getY() - b.getY();
+        double dz = a.getZ() - b.getZ();
+        return (dx * dx) + (dy * dy) + (dz * dz);
+    }
+
+    private double clampD(double v, double min, double max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    // ------------------------------------------------------------------
+    // NanoVG DRAWING HELPERS
+    // ------------------------------------------------------------------
+
+    private static float[] rgb(int r, int g, int b) {
+        return new float[]{r / 255f, g / 255f, b / 255f, 1f};
+    }
+
+    private static float[] color(int r, int g, int b) {
+        return rgb(r, g, b);
+    }
+
+    private static float[] color(int r, int g, int b, int a) {
+        return new float[]{r / 255f, g / 255f, b / 255f, a / 255f};
+    }
+
+    private org.lwjgl.nanovg.NVGColor toNvg(float[] c) {
+        return color(vg, c);
+    }
+
+    private float[] toNvgArr(float[] c) {
+        return c;
+    }
+
+    private org.lwjgl.nanovg.NVGColor color(long vg, float[] c) {
+        org.lwjgl.nanovg.NVGColor col = org.lwjgl.nanovg.NVGColor.create();
+        col.r(c[0]);
+        col.g(c[1]);
+        col.b(c[2]);
+        col.a(c.length > 3 ? c[3] : 1f);
+        return col;
+    }
+
+    private void fillRect(float x, float y, float w, float h, float[] c) {
+        nvgBeginPath(vg);
+        nvgRect(vg, x, y, w, h);
+        nvgFillColor(vg, toNvg(c));
+        nvgFill(vg);
+    }
+
+    private void panel(float x, float y, float w, float h, float[] fill, float[] border) {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, w, h, 4f);
+        nvgFillColor(vg, toNvg(fill));
+        nvgFill(vg);
+        nvgStrokeColor(vg, toNvg(border));
+        nvgStrokeWidth(vg, 1f);
+        nvgStroke(vg);
+    }
+
+    private void text(float x, float y, String s, float size, int font, float[] c) {
+        nvgFontFaceId(vg, font);
+        nvgFontSize(vg, size);
+        nvgFillColor(vg, toNvg(c));
+        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
+        nvgText(vg, x, y, s == null ? "" : s);
+    }
+
+    private float textWidth(String s, float size, int font) {
+        nvgFontFaceId(vg, font);
+        nvgFontSize(vg, size);
+        float[] bounds = new float[4];
+        return nvgTextBounds(vg, 0, 0, s, bounds);
+    }
+
+    private void line(float x1, float y1, float x2, float y2) {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, x1, y1);
+        nvgLineTo(vg, x2, y2);
+        nvgStroke(vg);
+    }
+
+    private void circleFill(float cx, float cy, float r, float[] c) {
+        nvgBeginPath(vg);
+        nvgCircle(vg, cx, cy, r);
+        nvgFillColor(vg, toNvg(c));
+        nvgFill(vg);
+    }
+
+    private void circleStroke(float cx, float cy, float r, float[] c) {
+        nvgBeginPath(vg);
+        nvgCircle(vg, cx, cy, r);
+        nvgStrokeColor(vg, toNvg(c));
+        nvgStrokeWidth(vg, 1.5f);
+        nvgStroke(vg);
+    }
+
+    private void triangleFill(float x1, float y1, float x2, float y2, float x3, float y3, float[] c) {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, x1, y1);
+        nvgLineTo(vg, x2, y2);
+        nvgLineTo(vg, x3, y3);
+        nvgClosePath(vg);
+        nvgFillColor(vg, toNvg(c));
+        nvgFill(vg);
+    }
+
+    // ------------------------------------------------------------------
+    // MUI TOOLKIT
+    // ------------------------------------------------------------------
+
+    private class Ui {
+        double mouseX, mouseY;
+        boolean mouseDown;
+        boolean mousePressedThisFrame;
+        boolean rightMousePressedThisFrame;
+        double scrollDeltaY;
+        boolean backspaceRequested;
+        boolean enterRequested;
+        final LinkedList<Character> charQueue = new LinkedList<>();
+
+        String activeTextField = null;
+        String lastEnterConsumer = null;
+        final Map<String, Double> scrollOffsets = new HashMap<>();
+
+        boolean button(long vg, String id, float x, float y, float w, float h, String label, int font, float[] bg, boolean selected) {
+            boolean hovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+            float[] fill = hovered ? brighten(bg) : bg;
+            panel(x, y, w, h, fill, selected ? TEXT_WARNING : BORDER_SOFT);
+            float tw = textWidth(label, 13, font);
+            text(x + (w - tw) / 2f, y + h / 2f + 4.5f, label, 13, font, TEXT_WHITE);
+            boolean clicked = hovered && mousePressedThisFrame;
+            if (clicked) {
+                mousePressedThisFrame = false; // consume
+            }
+            return clicked;
+        }
+
+        void textField(long vg, String id, float x, float y, float w, float h, StringBuilder buffer, boolean maskChars, int font) {
+            boolean hovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+            if (hovered && mousePressedThisFrame) {
+                activeTextField = id;
+                mousePressedThisFrame = false;
+            }
+            boolean active = id.equals(activeTextField);
+
+            panel(x, y, w, h, BG_FIELD, active ? TEXT_WARNING : BORDER_SOFT);
+
+            if (active) {
+                for (Character ch : charQueue) {
+                    if (ch >= 32 && ch != 127) {
+                        buffer.append((char) ch);
+                    }
+                }
+                if (backspaceRequested && !buffer.isEmpty()) {
+                    buffer.deleteCharAt(buffer.length() - 1);
+                }
+                if (enterRequested) {
+                    lastEnterConsumer = id;
+                }
+            }
+
+            String display = maskChars ? "*".repeat(buffer.length()) : buffer.toString();
+            text(x + 8, y + h / 2f + 5, display, 14, font, TEXT_WHITE);
+        }
+
+        boolean enterConsumedThisWidget(String id) {
+            return id.equals(lastEnterConsumer);
+        }
+
+        void scrollableText(long vg, String id, float x, float y, float w, float h, String content, float size, int font, float[] c) {
+            nvgSave(vg);
+            nvgScissor(vg, x, y, w, h);
+
+            List<String> lines = wrapText(content, w - 8, size, font);
+            double lineHeight = size + 4;
+            double contentHeight = lines.size() * lineHeight;
+            double maxScroll = Math.max(0, contentHeight - h);
+
+            boolean hovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+            double offset = scrollOffsets.getOrDefault(id, 0.0);
+            if (hovered && scrollDeltaY != 0) {
+                offset = clampD(offset - scrollDeltaY * lineHeight * 2, 0, maxScroll);
+                scrollOffsets.put(id, offset);
+            }
+
+            float ty = y + (float) (size) - (float) offset;
+            for (String line : lines) {
+                if (ty >= y - lineHeight && ty <= y + h + lineHeight) {
+                    text(x, ty, line, size, font, c);
+                }
+                ty += lineHeight;
+            }
+            nvgRestore(vg);
+        }
+
+        private List<String> wrapText(String content, float maxWidth, float size, int font) {
+            List<String> result = new ArrayList<>();
+            if (content == null) {
+                return result;
+            }
+            for (String rawLine : content.split("\n", -1)) {
+                if (rawLine.isEmpty()) {
+                    result.add("");
+                    continue;
+                }
+                StringBuilder current = new StringBuilder();
+                for (String word : rawLine.split(" ")) {
+                    String candidate = current.isEmpty() ? word : current + " " + word;
+                    if (textWidth(candidate, size, font) > maxWidth && !current.isEmpty()) {
+                        result.add(current.toString());
+                        current = new StringBuilder(word);
+                    } else {
+                        current = new StringBuilder(candidate);
+                    }
+                }
+                result.add(current.toString());
+            }
+            return result;
+        }
+
+        private float[] brighten(float[] c) {
+            float[] out = new float[c.length];
+            for (int i = 0; i < 3 && i < c.length; i++) {
+                out[i] = Math.min(1f, c[i] + 0.08f);
+            }
+            if (c.length > 3) out[3] = c[3];
+            return out;
+        }
+
+        void endFrame() {
+            mousePressedThisFrame = false;
+            rightMousePressedThisFrame = false;
+            scrollDeltaY = 0;
+            backspaceRequested = false;
+            enterRequested = false;
+            lastEnterConsumer = null;
+            charQueue.clear();
+        }
     }
 }
