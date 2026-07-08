@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 
 public class CelestialSons {
     
-    static void main(String[] args) {
+    public static void main(String[] args) {
         gameLoop();
     }
 

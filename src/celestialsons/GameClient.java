@@ -28,8 +28,8 @@ public class GameClient {
     private static final int WINDOW_H = 920;
     private static final long STATE_REFRESH_INTERVAL_NANOS = 250_000_000L;
 
-    private static final String FONT_REGULAR_PATH = "/home/trux/IdeaProjects/celestial-sons/assets/fonts/Roboto-Bold.ttf";
-    private static final String FONT_BOLD_PATH = "/home/trux/IdeaProjects/celestial-sons/assets/fonts/Roboto-Regular.ttf";
+    private static final String FONT_REGULAR_PATH = "assets/fonts/Roboto-Bold.ttf";
+    private static final String FONT_BOLD_PATH = "assets/fonts/Roboto-Regular.ttf";
 
     // Palette
     private static final float[] BG_ROOT = rgb(11, 17, 28);
@@ -358,8 +358,8 @@ public class GameClient {
         float viewH = windowHeight - HEADER_H - CONTROLS_H;
 
         switch (activeView) {
-            case "radar" -> renderRadarView(0, viewY, windowWidth, viewH);
-            case "SystemMap" -> renderSystemMapView(0, viewY, windowWidth, viewH);
+            //case "radar" -> renderRadarView(0, viewY, windowWidth, viewH);
+            case "systemMap" -> renderSystemMapView(0, viewY, windowWidth, viewH);
             case "starMap" -> renderStarMapView(0, viewY, windowWidth, viewH);
             case "station" -> renderStationView(0, viewY, windowWidth, viewH);
             default -> renderRadarView(0, viewY, windowWidth, viewH);
@@ -672,6 +672,7 @@ public class GameClient {
     private static final float SIDE_PANEL_W = 320;
 
     private void renderSystemMapView(float x, float y, float w, float h) {
+        //System.out.print("Constraints: (X, Y, W, H)" + x + y + w + h);
         float mapW = w - SIDE_PANEL_W;
         renderSystemMapCanvas(x, y, mapW, h);
         renderSystemMapSidePanel(x + mapW, y, SIDE_PANEL_W, h);
@@ -1228,7 +1229,9 @@ public class GameClient {
             text((float) x + 10, iy + 19, item.label, 13, fontRegular, TEXT_WHITE);
             if (hovered && ui.mousePressedThisFrame) {
                 item.action.run();
+                System.out.println("Running action: " + item.label);
                 activeContextMenu = null;
+                break;
             }
         }
 
@@ -1268,6 +1271,7 @@ public class GameClient {
     }
 
     private void switchView(String view) {
+        System.out.println("Switching view to: " + view);
         switch (view) {
             case "systemMap" -> selectSystemMapView();
             case "starMap" -> selectStarMapView();
