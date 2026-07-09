@@ -78,7 +78,7 @@ public class GameClient {
     private String statusMessage = " ";
     private String loginMessage = " ";
 
-    // simple context-menu state for the system map (replaces JPopupMenu)
+    // simple context-menu state for the system map
     private ContextMenu activeContextMenu = null;
 
     public GameClient(GameServerConnection server) {
@@ -347,8 +347,8 @@ public class GameClient {
     // GAME SHELL : HEADER + VIEW + BOTTOM CONTROLS
     // --------------------------------------
 
-    private static final float HEADER_H = 110;
-    private static final float CONTROLS_H = 110;
+    private static final float HEADER_H = 110; // defualt 110
+    private static final float CONTROLS_H = 10; // default 110
 
     private void renderGame() {
         fillRect(0, 0, windowWidth, windowHeight, BG_VIEW);
@@ -379,7 +379,7 @@ public class GameClient {
         float x = 16;
         float y = 26;
         text(x, y, "Celestial Sons", 22, fontBold, TEXT_WHITE);
-        y += 26;
+        y += 50;
         String pilotLine = activePlayer != null ? "Pilot: " + safeName(activePlayer) : " ";
         text(x, y, pilotLine, 14, fontRegular, TEXT_BODY);
         y += 22;
@@ -413,7 +413,7 @@ public class GameClient {
 
     private void renderSpaceControls(float x, float y, float w, float h) {
         float pad = 14;
-        text(x + pad, y = 20, "Radar Distance; " + selectedRadarRangeKm + " km", 13, fontRegular, TEXT_MUTED);
+        text(x + pad, y - 20, "Radar Distance; " + selectedRadarRangeKm + " km", 13, fontRegular, TEXT_MUTED);
 
         float bx = x + pad;
         float by = y + 30;
@@ -809,7 +809,7 @@ public class GameClient {
     private void renderSystemMapSidePanel(float x, float y, float w, float h) {
         fillRect(x, y, w, h, color(10, 16, 26));
         float sectionH = h / 3f;
-        detailPanel(x + 12, y + 12, w - 24, sectionH =- 20, "System", buildSystemDetailsText());
+        detailPanel(x + 12, y + 12, w - 24, sectionH - 20, "System", buildSystemDetailsText());
         // TODO: Characters details panel
         // TODO: Flightplans details panel
     }
